@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+ import { useEffect, useState } from "react";
 import axios from "axios";
 
 const SupportChat = () => {
@@ -6,55 +6,98 @@ const SupportChat = () => {
   const [selected, setSelected] = useState(null);
   const [reply, setReply] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [adminLoggedIn, setAdminLoggedIn] = useState(false);
 
+  // -------------------- Fetch Admin User --------------------
+  const checkAdminLogin = async () => {
+    try {
+      const res = await axios.get(
+        "https://foodex-backend--muzamilsakhi079.replit.app/api/auth/me", // backend route to get logged-in user
+        { withCredentials: true }
+      );
+
+      if (res.data.user.role === "admin") {
+        setAdminLoggedIn(true);
+        fetchQueries(); // fetch queries only if admin
+      } else {
+        setError("Access denied: Admins only");
+      }
+    } catch {
+      setError("Unauthorized: Please log in as admin");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // -------------------- Fetch All Queries --------------------
   const fetchQueries = async () => {
     try {
       const res = await axios.get(
         "https://foodex-backend--muzamilsakhi079.replit.app/api/contact",
-        { withCredentials: true }
+        { withCredentials: true } // send JWT cookie
       );
       setQueries(res.data.data);
-    } catch {
-      setError("Unauthorized or session expired");
+    } catch (err) {
+      setError(err.response?.data?.error || "Failed to fetch queries");
+    }
+  };
+
+  // -------------------- Send Admin Response --------------------
+  const sendResponse = async () => {
+    if (!reply || !selected) return;
+
+    try {
+      await axios.put(
+        `https://foodex-backend--muzamilsakhi079.replit.app/api/contact/${selected._id}/respond`,
+        { response: reply, status: "resolved" },
+        { withCredentials: true }
+      );
+      setReply("");
+      setSelected(null);
+      fetchQueries();
+    } catch (err) {
+      setError(err.response?.data?.error || "Failed to send response");
+    }
+  };
+
+  // -------------------- Delete Query --------------------
+  const deleteQuery = async (id) => {
+    if (!window.confirm("Delete this query?")) return;
+
+    try {
+      await axios.delete(
+        `https://foodex-backend--muzamilsakhi079.replit.app/api/contact/${id}`,
+        { withCredentials: true }
+      );
+      fetchQueries();
+    } catch (err) {
+      setError(err.response?.data?.error || "Failed to delete query");
     }
   };
 
   useEffect(() => {
-    fetchQueries();
+    checkAdminLogin();
   }, []);
 
-  const sendResponse = async () => {
-    if (!reply) return;
-
-    await axios.put(
-      `https://foodex-backend--muzamilsakhi079.replit.app/api/contact/${selected._id}/respond`,
-      {
-        response: reply,
-        status: "resolved",
-      },
-      { withCredentials: true }
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-500">
+        Loading...
+      </div>
     );
-
-    setReply("");
-    setSelected(null);
-    fetchQueries();
-  };
-
-  const deleteQuery = async (id) => {
-    if (!window.confirm("Delete this query?")) return;
-
-    await axios.delete(
-      `https://foodex-backend--muzamilsakhi079.replit.app/api/contact/${id}`,
-      { withCredentials: true }
-    );
-
-    fetchQueries();
-  };
 
   if (error)
     return (
       <div className="min-h-screen flex items-center justify-center text-red-500">
         {error}
+      </div>
+    );
+
+  if (!adminLoggedIn)
+    return (
+      <div className="min-h-screen flex items-center justify-center text-yellow-600">
+        Please log in as admin to access this panel.
       </div>
     );
 
@@ -67,10 +110,7 @@ const SupportChat = () => {
       {/* Queries Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         {queries.map((q) => (
-          <div
-            key={q._id}
-            className="bg-white rounded-xl shadow p-4 space-y-3"
-          >
+          <div key={q._id} className="bg-white rounded-xl shadow p-4 space-y-3">
             <div className="flex justify-between items-center">
               <p className="font-semibold text-gray-800">{q.name}</p>
               <span
@@ -86,14 +126,12 @@ const SupportChat = () => {
 
             <p className="text-xs text-gray-500">{q.email}</p>
 
-            {/* User Message */}
             <div className="bg-gray-50 border rounded-lg p-3">
               <p className="text-sm text-gray-700">
                 <span className="font-medium">User:</span> {q.message}
               </p>
             </div>
 
-            {/* Admin Response */}
             {q.response && (
               <div className="bg-green-50 border border-green-200 rounded-lg p-3">
                 <p className="text-sm text-green-800">
