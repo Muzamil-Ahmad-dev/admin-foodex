@@ -27,7 +27,7 @@ const SupportChat = () => {
     if (!reply) return;
 
     await axios.put(
-      `http://localhost:5000/api/contact/${selected._id}/respond`,
+      `https://foodex-backend--muzamilsakhi079.replit.app/api/contact/${selected._id}/respond`,
       {
         response: reply,
         status: "resolved",
@@ -44,7 +44,7 @@ const SupportChat = () => {
     if (!window.confirm("Delete this query?")) return;
 
     await axios.delete(
-      `http://localhost:5000/api/contact/${id}`,
+      `https://foodex-backend--muzamilsakhi079.replit.app/api/contact/${id}`,
       { withCredentials: true }
     );
 
