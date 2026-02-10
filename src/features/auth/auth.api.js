@@ -1,4 +1,4 @@
- const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api/auth";
+ const BASE_URL = import.meta.env.VITE_API_URL || "https://foodex-backend--muzamilsakhi079.replit.app/api/auth";
 
 // User API
 export const registerUser = async (name, email, password) => {
