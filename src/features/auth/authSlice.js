@@ -1,6 +1,6 @@
  // src/store/authSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { userLogin, adminLogin } from "../auth/auth.api";
+import { userLogin, adminLogin } from "../auth/auth.api"; // fixed relative path
 
 // ------------------ INITIAL STATE ------------------
 const initialState = {
@@ -18,9 +18,7 @@ export const userLoginThunk = createAsyncThunk(
   async ({ email, password }, { rejectWithValue }) => {
     try {
       const data = await userLogin(email, password);
-      if (data.user.role !== "user") {
-        throw new Error("Access denied: Not a user");
-      }
+      if (data.user.role !== "user") throw new Error("Access denied: Not a user");
       return data.user;
     } catch (err) {
       return rejectWithValue(err.message || "Login failed");
@@ -34,9 +32,7 @@ export const adminLoginThunk = createAsyncThunk(
   async ({ email, password }, { rejectWithValue }) => {
     try {
       const data = await adminLogin(email, password);
-      if (data.user.role !== "admin") {
-        throw new Error("Access denied: Not an admin");
-      }
+      if (data.user.role !== "admin") throw new Error("Access denied: Not an admin");
       return data.user;
     } catch (err) {
       return rejectWithValue(err.message || "Admin login failed");

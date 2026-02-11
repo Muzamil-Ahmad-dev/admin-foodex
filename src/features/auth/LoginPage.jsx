@@ -10,7 +10,6 @@ const LoginPage = ({ isAdmin = false }) => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const { loading, error } = useSelector((state) => state.auth);
 
   const handleSubmit = async (e) => {
