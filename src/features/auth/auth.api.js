@@ -1,39 +1,29 @@
  // src/api/auth.api.js
-const BASE_URL =
-  import.meta.env.VITE_API_URL || "https://foodex-backend--muzamilsakhi079.replit.app/api/auth";
+import axios from "axios";
 
-const request = async (endpoint, options = {}) => {
-  const res = await fetch(`${BASE_URL}${endpoint}`, {
-    credentials: "include", // REQUIRED for cookies/sessions
-    headers: {
-      "Content-Type": "application/json",
-    },
-    ...options,
-  });
-
-  const data = await res.json();
-
-  if (!res.ok) {
-    throw new Error(data.message || "Request failed");
-  }
-
-  return data;
-};
+// Create Axios instance
+const api = axios.create({
+  baseURL: "https://foodex-backend--muzamilsakhi079.replit.app/api/auth", // fallback hardcoded URL
+  withCredentials: true, // ✅ required for sending cookies
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 // -------------------- API FUNCTIONS --------------------
+
+// User login
 export const userLogin = (email, password) =>
-  request("/login", {
-    method: "POST",
-    body: JSON.stringify({ email, password }),
-  });
+  api.post("/login", { email, password }).then((res) => res.data);
 
+// Admin login
 export const adminLogin = (email, password) =>
-  request("/admin/login", {
-    method: "POST",
-    body: JSON.stringify({ email, password }),
-  });
+  api.post("/admin/login", { email, password }).then((res) => res.data);
 
-export const getAdminDashboard = () => request("/admin/dashboard");
+// Get admin dashboard
+export const getAdminDashboard = () =>
+  api.get("/admin/dashboard").then((res) => res.data);
 
+// Logout admin
 export const logoutAdmin = () =>
-  request("/logout", { method: "POST" });
+  api.post("/logout").then((res) => res.data);
