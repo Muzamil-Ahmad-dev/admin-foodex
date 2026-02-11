@@ -1,45 +1,39 @@
- const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api/auth";
+ // src/api/auth.api.js
+const BASE_URL =
+  import.meta.env.VITE_API_URL || "https://foodex-backend--muzamilsakhi079.replit.app/api/auth";
 
-// User API
-export const registerUser = async (name, email, password) => {
-  const res = await fetch(`${BASE_URL}/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, email, password }),
+const request = async (endpoint, options = {}) => {
+  const res = await fetch(`${BASE_URL}${endpoint}`, {
+    credentials: "include", // REQUIRED for cookies/sessions
+    headers: {
+      "Content-Type": "application/json",
+    },
+    ...options,
   });
-  return res.json();
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || "Request failed");
+  }
+
+  return data;
 };
 
-export const loginUser = async (email, password) => {
-  const res = await fetch(`${BASE_URL}/login`, {
+// -------------------- API FUNCTIONS --------------------
+export const userLogin = (email, password) =>
+  request("/login", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
   });
-  return res.json();
-};
 
-// Admin API
-export const loginAdmin = async (email, password) => {
-  const res = await fetch(`${BASE_URL}/login`, {
+export const adminLogin = (email, password) =>
+  request("/admin/login", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
   });
-  return res.json();
-};
 
-// Protected requests
-export const getUserProfile = async (token) => {
-  const res = await fetch(`${BASE_URL}/user/profile`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return res.json();
-};
+export const getAdminDashboard = () => request("/admin/dashboard");
 
-export const getAdminDashboard = async (token) => {
-  const res = await fetch(`${BASE_URL}/admin/dashboard`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return res.json();
-};
+export const logoutAdmin = () =>
+  request("/logout", { method: "POST" });

@@ -1,23 +1,29 @@
- import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { loginUser, loginAdmin } from "./auth.api.js";
+ // src/store/authSlice.js
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { userLogin, adminLogin } from "../api/auth.api.js";
 
+// ------------------ INITIAL STATE ------------------
 const initialState = {
   user: null,
   admin: null,
-  token: null,
   loading: false,
   error: null,
 };
 
+// ------------------ ASYNC THUNKS ------------------
+
 // User login
-export const userLogin = createAsyncThunk(
+export const userLoginThunk = createAsyncThunk(
   "auth/userLogin",
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const data = await loginUser(email, password);
-      return data;
+      const data = await userLogin(email, password);
+      if (data.user.role !== "user") {
+        throw new Error("Access denied: Not a user");
+      }
+      return data.user;
     } catch (err) {
-      return rejectWithValue(err.message);
+      return rejectWithValue(err.message || "Login failed");
     }
   }
 );
@@ -27,14 +33,18 @@ export const adminLoginThunk = createAsyncThunk(
   "auth/adminLogin",
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const data = await loginAdmin(email, password);
-      return data;
+      const data = await adminLogin(email, password);
+      if (data.user.role !== "admin") {
+        throw new Error("Access denied: Not an admin");
+      }
+      return data.user;
     } catch (err) {
-      return rejectWithValue(err.message);
+      return rejectWithValue(err.message || "Admin login failed");
     }
   }
 );
 
+// ------------------ SLICE ------------------
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -42,23 +52,25 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.admin = null;
-      state.token = null;
+      state.loading = false;
+      state.error = null;
+    },
+    clearError: (state) => {
       state.error = null;
     },
   },
   extraReducers: (builder) => {
     builder
       // User login
-      .addCase(userLogin.pending, (state) => {
+      .addCase(userLoginThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(userLogin.fulfilled, (state, action) => {
+      .addCase(userLoginThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
-        state.token = action.payload.token;
+        state.user = action.payload;
       })
-      .addCase(userLogin.rejected, (state, action) => {
+      .addCase(userLoginThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
@@ -70,8 +82,7 @@ const authSlice = createSlice({
       })
       .addCase(adminLoginThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.admin = action.payload.user;
-        state.token = action.payload.token;
+        state.admin = action.payload;
       })
       .addCase(adminLoginThunk.rejected, (state, action) => {
         state.loading = false;
@@ -80,5 +91,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout } = authSlice.actions;
+// ------------------ EXPORTS ------------------
+export const { logout, clearError } = authSlice.actions;
 export default authSlice.reducer;
