@@ -1,10 +1,10 @@
  // src/api/auth.api.js
 import axios from "axios";
 
-// Create Axios instance
+// -------------------- AXIOS INSTANCE --------------------
 const api = axios.create({
-  baseURL: "https://foodex-backend--muzamilsakhi079.replit.app/api/auth", // fallback hardcoded URL
-  withCredentials: true, // ✅ required for sending cookies
+  baseURL: "https://foodex-backend--muzamilsakhi079.replit.app/api/auth", // production backend
+  withCredentials: true, // ✅ send cookies for auth
   headers: {
     "Content-Type": "application/json",
   },
@@ -27,3 +27,5 @@ export const getAdminDashboard = () =>
 // Logout admin
 export const logoutAdmin = () =>
   api.post("/logout").then((res) => res.data);
+
+export default api;
