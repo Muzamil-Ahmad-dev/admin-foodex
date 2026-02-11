@@ -1,5 +1,8 @@
- import { useEffect, useState } from "react";
+ // src/components/SupportChat.jsx
+import { useEffect, useState } from "react";
 import axios from "axios";
+
+const BASE_URL = "https://foodex-backend--muzamilsakhi079.replit.app/api/contact";
 
 const SupportChat = () => {
   const [queries, setQueries] = useState([]);
@@ -9,11 +12,11 @@ const SupportChat = () => {
   const [loading, setLoading] = useState(true);
   const [adminLoggedIn, setAdminLoggedIn] = useState(false);
 
-  // -------------------- Fetch Admin User --------------------
+  // -------------------- Check Admin Login --------------------
   const checkAdminLogin = async () => {
     try {
       const res = await axios.get(
-        "https://foodex-backend--muzamilsakhi079.replit.app/api/auth/me", // backend route to get logged-in user
+        "https://foodex-backend--muzamilsakhi079.replit.app/api/auth/me",
         { withCredentials: true }
       );
 
@@ -30,13 +33,10 @@ const SupportChat = () => {
     }
   };
 
-  // -------------------- Fetch All Queries --------------------
+  // -------------------- Fetch All Queries (Admin Only) --------------------
   const fetchQueries = async () => {
     try {
-      const res = await axios.get(
-        "https://foodex-backend--muzamilsakhi079.replit.app/api/contact",
-        { withCredentials: true } // send JWT cookie
-      );
+      const res = await axios.get(BASE_URL, { withCredentials: true });
       setQueries(res.data.data);
     } catch (err) {
       setError(err.response?.data?.error || "Failed to fetch queries");
@@ -49,10 +49,11 @@ const SupportChat = () => {
 
     try {
       await axios.put(
-        `https://foodex-backend--muzamilsakhi079.replit.app/api/contact/${selected._id}/respond`,
+        `${BASE_URL}/${selected._id}/respond`,
         { response: reply, status: "resolved" },
         { withCredentials: true }
       );
+
       setReply("");
       setSelected(null);
       fetchQueries();
@@ -61,15 +62,12 @@ const SupportChat = () => {
     }
   };
 
-  // -------------------- Delete Query --------------------
+  // -------------------- Delete Query (Admin Only) --------------------
   const deleteQuery = async (id) => {
     if (!window.confirm("Delete this query?")) return;
 
     try {
-      await axios.delete(
-        `https://foodex-backend--muzamilsakhi079.replit.app/api/contact/${id}`,
-        { withCredentials: true }
-      );
+      await axios.delete(`${BASE_URL}/${id}`, { withCredentials: true });
       fetchQueries();
     } catch (err) {
       setError(err.response?.data?.error || "Failed to delete query");
