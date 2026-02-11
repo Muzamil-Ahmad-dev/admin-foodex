@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { getAdminDashboard, logout as logoutApi } from "../auth/auth.api";
+import { getAdminDashboard, logout as logoutApi } from "../../features/auth/auth.api";
 
 const Navbar = ({ menuOpen, setMenuOpen }) => {
   const [admin, setAdmin] = useState(null);
