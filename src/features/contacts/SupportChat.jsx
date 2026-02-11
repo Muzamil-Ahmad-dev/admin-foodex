@@ -11,13 +11,14 @@ const SupportChat = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [adminLoggedIn, setAdminLoggedIn] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false); // ✅ new state
 
   // Check if admin is logged in
   const checkAdminLogin = async () => {
     try {
       const res = await axios.get(
         "https://foodex-backend--muzamilsakhi079.replit.app/api/auth/user/profile",
-        { withCredentials: true } // ✅ send cookie
+        { withCredentials: true }
       );
 
       if (res.data.user.role === "admin") {
@@ -36,20 +37,25 @@ const SupportChat = () => {
   // Fetch all contact queries
   const fetchQueries = async () => {
     try {
+      setLoading(true);
       const res = await axios.get(BASE_URL, { withCredentials: true });
       setQueries(res.data.data);
+      setError("");
     } catch (err) {
       setError(err.response?.data?.error || "Failed to fetch queries");
+    } finally {
+      setLoading(false);
     }
   };
 
   // Send reply to a query
   const sendResponse = async () => {
-    if (!reply || !selected) return;
+    if (!reply.trim() || !selected) return;
     try {
+      setActionLoading(true);
       await axios.put(
         `${BASE_URL}/${selected._id}/respond`,
-        { response: reply, status: "resolved" },
+        { response: reply.trim(), status: "resolved" },
         { withCredentials: true }
       );
       setReply("");
@@ -57,6 +63,8 @@ const SupportChat = () => {
       fetchQueries();
     } catch (err) {
       setError(err.response?.data?.error || "Failed to send response");
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -64,10 +72,13 @@ const SupportChat = () => {
   const deleteQuery = async (id) => {
     if (!window.confirm("Delete this query?")) return;
     try {
+      setActionLoading(true);
       await axios.delete(`${BASE_URL}/${id}`, { withCredentials: true });
       fetchQueries();
     } catch (err) {
       setError(err.response?.data?.error || "Failed to delete query");
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -100,8 +111,18 @@ const SupportChat = () => {
               </div>
             )}
             <div className="flex gap-2 pt-2">
-              <button onClick={() => { setSelected(q); setReply(q.response || ""); }} className="flex-1 bg-blue-600 text-white text-sm py-1.5 rounded-lg hover:bg-blue-700">{q.response ? "Edit Reply" : "Reply"}</button>
-              <button onClick={() => deleteQuery(q._id)} className="flex-1 bg-red-500 text-white text-sm py-1.5 rounded-lg hover:bg-red-600">Delete</button>
+              <button 
+                onClick={() => { setSelected(q); setReply(q.response || ""); }} 
+                className="flex-1 bg-blue-600 text-white text-sm py-1.5 rounded-lg hover:bg-blue-700"
+              >
+                {q.response ? "Edit Reply" : "Reply"}
+              </button>
+              <button 
+                onClick={() => deleteQuery(q._id)} 
+                className="flex-1 bg-red-500 text-white text-sm py-1.5 rounded-lg hover:bg-red-600"
+              >
+                Delete
+              </button>
             </div>
           </div>
         ))}
@@ -114,10 +135,21 @@ const SupportChat = () => {
             <div className="bg-gray-50 border rounded-lg p-3 text-sm text-gray-700">
               <span className="font-medium">User:</span> {selected.message}
             </div>
-            <textarea className="w-full border rounded-lg p-3 h-28 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Type admin response..." value={reply} onChange={(e) => setReply(e.target.value)} />
+            <textarea 
+              className="w-full border rounded-lg p-3 h-28 focus:ring-2 focus:ring-blue-500 outline-none" 
+              placeholder="Type admin response..." 
+              value={reply} 
+              onChange={(e) => setReply(e.target.value)} 
+            />
             <div className="flex justify-end gap-2">
               <button onClick={() => setSelected(null)} className="px-4 py-2 rounded-lg border">Cancel</button>
-              <button onClick={sendResponse} className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700">Send</button>
+              <button 
+                onClick={sendResponse} 
+                disabled={!reply.trim() || actionLoading} 
+                className={`px-4 py-2 rounded-lg text-white ${!reply.trim() || actionLoading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+              >
+                {actionLoading ? "Sending..." : "Send"}
+              </button>
             </div>
           </div>
         </div>
