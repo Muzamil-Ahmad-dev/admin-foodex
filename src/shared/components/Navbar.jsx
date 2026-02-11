@@ -1,10 +1,31 @@
- import { FaBell, FaUserCircle, FaBars } from "react-icons/fa";
+ // src/components/Navbar.jsx
+import { FaBell, FaUserCircle, FaBars } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { useSelector } from "react-redux";
-import { Link } from "react-router-dom"; // <-- for routing
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
+
+const BASE_URL = "https://foodex-backend--muzamilsakhi079.replit.app/api";
 
 const Navbar = ({ menuOpen, setMenuOpen }) => {
-  const admin = useSelector((state) => state.auth.admin);
+  const [admin, setAdmin] = useState(null);
+
+  // Fetch admin profile
+  useEffect(() => {
+    const fetchAdmin = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/auth/user/profile`, {
+          withCredentials: true, // ✅ send cookies
+        });
+        if (res.data.user.role === "admin") setAdmin(res.data.user);
+      } catch (err) {
+        setAdmin(null);
+        console.error("Admin fetch error:", err.response?.data || err.message);
+      }
+    };
+
+    fetchAdmin();
+  }, []);
 
   return (
     <div className="w-full bg-[#2D1B0E]/90 backdrop-blur-sm border-b border-amber-900/30 shadow sticky top-0 z-50">
@@ -25,25 +46,21 @@ const Navbar = ({ menuOpen, setMenuOpen }) => {
 
         {/* Right: Notification + Admin / Login */}
         <div className="flex items-center gap-4 lg:gap-6">
-          {/* Notification bell */}
           <motion.div whileHover={{ scale: 1.2 }} className="relative cursor-pointer text-amber-400">
             <FaBell size={22} />
             <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse" />
           </motion.div>
 
-          {/* Admin profile or login */}
           <div className="flex items-center gap-2">
             <motion.div whileHover={{ scale: 1.2, rotate: 10 }} className="cursor-pointer text-amber-400">
               <FaUserCircle size={26} />
             </motion.div>
 
             {admin ? (
-              // Show admin name if logged in
               <span className="text-amber-400 font-semibold hidden sm:inline">
                 {admin.name}
               </span>
             ) : (
-              // Show Login link if not logged in
               <Link
                 to="/admin"
                 className="text-amber-400 font-semibold hover:underline hidden sm:inline"
@@ -55,7 +72,6 @@ const Navbar = ({ menuOpen, setMenuOpen }) => {
         </div>
       </div>
 
-      {/* Decorative bottom line */}
       <div className="h-[3px] w-full bg-gradient-to-r from-amber-600 via-orange-500 to-amber-600 shadow-md" />
     </div>
   );
