@@ -1,7 +1,7 @@
  // src/components/LoginPage.jsx
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { userLoginThunk, adminLoginThunk } from "../store/authSlice.js";
+import { userLoginThunk, adminLoginThunk } from "../auth/authSlice";
 import { useNavigate } from "react-router-dom";
 
 const LoginPage = ({ isAdmin = false }) => {

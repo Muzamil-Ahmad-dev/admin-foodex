@@ -1,6 +1,6 @@
  // src/store/authSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { userLogin, adminLogin } from "../api/auth.api.js";
+import { userLogin, adminLogin } from "../auth/auth.api";
 
 // ------------------ INITIAL STATE ------------------
 const initialState = {
