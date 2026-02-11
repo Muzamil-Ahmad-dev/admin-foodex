@@ -1,5 +1,5 @@
  import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { userLogin, adminLogin } from "../auth/auth.api";
+import { userLogin, adminLogin, logout as apiLogout } from "../auth/auth.api";
 
 const initialState = {
   user: null,
@@ -8,7 +8,7 @@ const initialState = {
   error: null,
 };
 
-// User login
+// User login thunk
 export const userLoginThunk = createAsyncThunk(
   "auth/userLogin",
   async ({ email, password }, { rejectWithValue }) => {
@@ -22,7 +22,7 @@ export const userLoginThunk = createAsyncThunk(
   }
 );
 
-// Admin login
+// Admin login thunk
 export const adminLoginThunk = createAsyncThunk(
   "auth/adminLogin",
   async ({ email, password }, { rejectWithValue }) => {
@@ -36,22 +36,22 @@ export const adminLoginThunk = createAsyncThunk(
   }
 );
 
+// Logout thunk
+export const logoutThunk = createAsyncThunk("auth/logout", async () => {
+  await apiLogout();
+});
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    logout: (state) => {
-      state.user = null;
-      state.admin = null;
-      state.loading = false;
-      state.error = null;
-    },
     clearError: (state) => {
       state.error = null;
     },
   },
   extraReducers: (builder) => {
     builder
+      // User login
       .addCase(userLoginThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -64,6 +64,8 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+
+      // Admin login
       .addCase(adminLoginThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -75,9 +77,17 @@ const authSlice = createSlice({
       .addCase(adminLoginThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      // Logout
+      .addCase(logoutThunk.fulfilled, (state) => {
+        state.user = null;
+        state.admin = null;
+        state.error = null;
+        state.loading = false;
       });
   },
 });
 
-export const { logout, clearError } = authSlice.actions;
+export const { clearError } = authSlice.actions;
 export default authSlice.reducer;
