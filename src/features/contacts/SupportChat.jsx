@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 const BASE_URL = "https://foodex-backend--muzamilsakhi079.replit.app/api/contact";
+const PROFILE_URL = "https://foodex-backend--muzamilsakhi079.replit.app/api/auth/user/profile";
 
 const SupportChat = () => {
   const [queries, setQueries] = useState([]);
@@ -14,11 +15,9 @@ const SupportChat = () => {
 
   // -------------------- Check Admin Login --------------------
   const checkAdminLogin = async () => {
+    setLoading(true);
     try {
-      const res = await axios.get(
-        "https://foodex-backend--muzamilsakhi079.replit.app/api/auth/me",
-        { withCredentials: true }
-      );
+      const res = await axios.get(PROFILE_URL, { withCredentials: true });
 
       if (res.data.user.role === "admin") {
         setAdminLoggedIn(true);
@@ -26,8 +25,8 @@ const SupportChat = () => {
       } else {
         setError("Access denied: Admins only");
       }
-    } catch {
-      setError("Unauthorized: Please log in as admin");
+    } catch (err) {
+      setError(err.response?.data?.message || "Unauthorized: Please log in as admin");
     } finally {
       setLoading(false);
     }
@@ -38,14 +37,15 @@ const SupportChat = () => {
     try {
       const res = await axios.get(BASE_URL, { withCredentials: true });
       setQueries(res.data.data);
+      setError(""); // clear previous errors
     } catch (err) {
-      setError(err.response?.data?.error || "Failed to fetch queries");
+      setError(err.response?.data?.message || "Failed to fetch queries");
     }
   };
 
   // -------------------- Send Admin Response --------------------
   const sendResponse = async () => {
-    if (!reply || !selected) return;
+    if (!selected) return;
 
     try {
       await axios.put(
@@ -56,9 +56,10 @@ const SupportChat = () => {
 
       setReply("");
       setSelected(null);
-      fetchQueries();
+      fetchQueries(); // refresh list
+      setError("");
     } catch (err) {
-      setError(err.response?.data?.error || "Failed to send response");
+      setError(err.response?.data?.message || "Failed to send response");
     }
   };
 
@@ -69,8 +70,9 @@ const SupportChat = () => {
     try {
       await axios.delete(`${BASE_URL}/${id}`, { withCredentials: true });
       fetchQueries();
+      setError("");
     } catch (err) {
-      setError(err.response?.data?.error || "Failed to delete query");
+      setError(err.response?.data?.message || "Failed to delete query");
     }
   };
 
@@ -78,6 +80,7 @@ const SupportChat = () => {
     checkAdminLogin();
   }, []);
 
+  // -------------------- Loading State --------------------
   if (loading)
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-500">
@@ -85,13 +88,24 @@ const SupportChat = () => {
       </div>
     );
 
+  // -------------------- Error State --------------------
   if (error)
     return (
-      <div className="min-h-screen flex items-center justify-center text-red-500">
-        {error}
+      <div className="min-h-screen flex flex-col items-center justify-center text-red-500 space-y-2">
+        <p>{error}</p>
+        <button
+          onClick={() => {
+            setError("");
+            checkAdminLogin();
+          }}
+          className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+        >
+          Retry
+        </button>
       </div>
     );
 
+  // -------------------- Not Admin --------------------
   if (!adminLoggedIn)
     return (
       <div className="min-h-screen flex items-center justify-center text-yellow-600">
@@ -99,11 +113,10 @@ const SupportChat = () => {
       </div>
     );
 
+  // -------------------- Main Admin Panel --------------------
   return (
     <div className="min-h-screen bg-gray-100 p-6">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-        Admin Support Panel
-      </h2>
+      <h2 className="text-2xl font-semibold text-gray-800 mb-6">Admin Support Panel</h2>
 
       {/* Queries Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -162,8 +175,17 @@ const SupportChat = () => {
 
       {/* Reply Modal */}
       {selected && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white w-full max-w-md rounded-xl p-6 space-y-4">
+        <div
+          className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+          onClick={() => {
+            setSelected(null);
+            setReply("");
+          }}
+        >
+          <div
+            className="bg-white w-full max-w-md rounded-xl p-6 space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
             <h3 className="text-lg font-semibold text-gray-800">
               Reply to {selected.name}
             </h3>
@@ -181,7 +203,10 @@ const SupportChat = () => {
 
             <div className="flex justify-end gap-2">
               <button
-                onClick={() => setSelected(null)}
+                onClick={() => {
+                  setSelected(null);
+                  setReply("");
+                }}
                 className="px-4 py-2 rounded-lg border"
               >
                 Cancel
