@@ -1,15 +1,12 @@
  import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { userLogin, adminLogin } from "../auth/auth.api";
 
-// ------------------ INITIAL STATE ------------------
 const initialState = {
   user: null,
   admin: null,
   loading: false,
   error: null,
 };
-
-// ------------------ ASYNC THUNKS ------------------
 
 // User login
 export const userLoginThunk = createAsyncThunk(
@@ -18,10 +15,6 @@ export const userLoginThunk = createAsyncThunk(
     try {
       const data = await userLogin(email, password);
       if (data.user.role !== "user") throw new Error("Access denied: Not a user");
-
-      // ✅ store access token
-      localStorage.setItem("accessToken", data.token);
-
       return data.user;
     } catch (err) {
       return rejectWithValue(err.message || "Login failed");
@@ -36,10 +29,6 @@ export const adminLoginThunk = createAsyncThunk(
     try {
       const data = await adminLogin(email, password);
       if (data.user.role !== "admin") throw new Error("Access denied: Not an admin");
-
-      // ✅ store access token
-      localStorage.setItem("accessToken", data.token);
-
       return data.user;
     } catch (err) {
       return rejectWithValue(err.message || "Admin login failed");
@@ -47,7 +36,6 @@ export const adminLoginThunk = createAsyncThunk(
   }
 );
 
-// ------------------ SLICE ------------------
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -57,9 +45,6 @@ const authSlice = createSlice({
       state.admin = null;
       state.loading = false;
       state.error = null;
-
-      // ✅ remove token on logout
-      localStorage.removeItem("accessToken");
     },
     clearError: (state) => {
       state.error = null;
@@ -67,7 +52,6 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // -------- User Login --------
       .addCase(userLoginThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -80,8 +64,6 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
-      // -------- Admin Login --------
       .addCase(adminLoginThunk.pending, (state) => {
         state.loading = true;
         state.error = null;

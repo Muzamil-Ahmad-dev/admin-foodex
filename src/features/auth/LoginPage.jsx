@@ -1,5 +1,4 @@
- // src/components/LoginPage.jsx
-import React, { useState } from "react";
+ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { userLoginThunk, adminLoginThunk } from "../auth/authSlice";
 import { useNavigate } from "react-router-dom";
@@ -10,7 +9,7 @@ const LoginPage = ({ isAdmin = false }) => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error } = useSelector((state) => state.auth);
+  const { loading, error, admin } = useSelector((state) => state.auth);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,7 +18,9 @@ const LoginPage = ({ isAdmin = false }) => {
     try {
       if (isAdmin) {
         const result = await dispatch(adminLoginThunk({ email, password })).unwrap();
-        if (result.role === "admin") navigate("/admin/dashboard");
+        if (result.role === "admin") {
+          navigate("/admin/dashboard");
+        }
       } else {
         const result = await dispatch(userLoginThunk({ email, password })).unwrap();
         if (result.role === "user") navigate("/orders");

@@ -1,5 +1,4 @@
- // src/components/Navbar.jsx
-import { FaBell, FaUserCircle, FaBars } from "react-icons/fa";
+ import { FaBell, FaUserCircle, FaBars } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -11,18 +10,17 @@ const Navbar = ({ menuOpen, setMenuOpen }) => {
   const [admin, setAdmin] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch admin profile
   useEffect(() => {
     const fetchAdmin = async () => {
       try {
         setLoading(true);
         const res = await axios.get(`${BASE_URL}/auth/admin/dashboard`, {
-          withCredentials: true, // send cookies
+          withCredentials: true, // ✅ cookies automatically sent
         });
 
-        // Backend might return user info here
-        if (res.data.user && res.data.user.role === "admin") {
-          setAdmin(res.data.user);
+        // ✅ Use admin info directly from response
+        if (res.data.admin && res.data.admin.role === "admin") {
+          setAdmin(res.data.admin);
         } else {
           setAdmin(null);
         }
@@ -40,7 +38,7 @@ const Navbar = ({ menuOpen, setMenuOpen }) => {
   return (
     <div className="w-full bg-[#2D1B0E]/90 backdrop-blur-sm border-b border-amber-900/30 shadow sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        {/* Left: Hamburger + Dashboard Title */}
+        {/* Left: Hamburger + Title */}
         <div className="flex items-center gap-4">
           <motion.button
             whileTap={{ scale: 0.9 }}
@@ -49,12 +47,13 @@ const Navbar = ({ menuOpen, setMenuOpen }) => {
           >
             <FaBars size={22} />
           </motion.button>
+
           <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-amber-400 via-orange-500 to-amber-600 bg-clip-text text-transparent">
             Dashboard
           </h2>
         </div>
 
-        {/* Right: Notification + Admin / Login */}
+        {/* Right: Notification + Admin/User */}
         <div className="flex items-center gap-4 lg:gap-6">
           <motion.div whileHover={{ scale: 1.2 }} className="relative cursor-pointer text-amber-400">
             <FaBell size={22} />
