@@ -1,9 +1,45 @@
-import React from 'react'
+ // src/pages/categories/List.jsx
+import React, { useEffect, useState } from "react";
+import { fetchCategories } from "../../features/categories/category.api";
 
-function CategorieList() {
+const CategoriesList = () => {
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const loadCategories = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchCategories();
+      setCategories(data);
+      setError("");
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  if (loading) return <p className="text-gray-500">Loading categories...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
+
   return (
-    <div>CategorieList</div>
-  )
-}
+    <div className="p-4">
+      <h2 className="text-2xl font-bold mb-4 text-amber-700">All Categories</h2>
+      <ul className="space-y-2">
+        {categories.map((cat) => (
+          <li key={cat._id} className="bg-white p-2 rounded shadow flex justify-between items-center">
+            <span>{cat.name}</span>
+            <span className="text-gray-500 text-sm">{cat.slug}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
 
-export default CategorieList
+export default CategoriesList;
