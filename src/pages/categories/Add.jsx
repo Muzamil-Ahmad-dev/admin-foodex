@@ -16,7 +16,6 @@ const CategoriesAdd = ({ onAdded }) => {
       setError("");
       setSuccess("");
 
-      // ✅ Axios interceptor automatically attaches accessToken
       const newCategory = await createCategory({ name });
 
       setName("");
@@ -24,20 +23,20 @@ const CategoriesAdd = ({ onAdded }) => {
 
       if (onAdded) onAdded(newCategory);
     } catch (err) {
-      // Friendly error message
-      setError(err.response?.data?.message || err.message || "Failed to add category");
+      setError(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="p-4 max-w-md bg-white shadow rounded">
-      <h2 className="text-2xl font-bold mb-4 text-amber-700">Add Category</h2>
+    <div className="p-4 max-w-md">
+      <h2 className="text-2xl font-bold mb-4 text-amber-700">
+        Add Category
+      </h2>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-2">
         <input
-          type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Category Name"
@@ -47,13 +46,13 @@ const CategoriesAdd = ({ onAdded }) => {
         <button
           type="submit"
           disabled={loading}
-          className={`py-2 rounded text-white ${loading ? "bg-amber-300" : "bg-amber-500 hover:bg-amber-600"}`}
+          className="bg-amber-500 text-white py-2 rounded hover:bg-amber-600"
         >
           {loading ? "Adding..." : "Add Category"}
         </button>
 
-        {error && <p className="text-red-500 mt-1">{error}</p>}
-        {success && <p className="text-green-600 mt-1">{success}</p>}
+        {error && <p className="text-red-500">{error}</p>}
+        {success && <p className="text-green-600">{success}</p>}
       </form>
     </div>
   );
