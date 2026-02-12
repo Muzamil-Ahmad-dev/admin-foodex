@@ -1,11 +1,16 @@
  import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import { createCategory } from "../../features/categories/category.api";
 
 const CategoriesAdd = ({ onAdded }) => {
+  const { user } = useSelector((state) => state.auth);
+
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  if (!user) return <p className="text-yellow-600">Please login to add a category.</p>;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,7 +21,7 @@ const CategoriesAdd = ({ onAdded }) => {
       setError("");
       setSuccess("");
 
-      const newCategory = await createCategory({ name });
+      const newCategory = await createCategory({ name }, user.token); // pass token
 
       setName("");
       setSuccess(`Category "${newCategory.name}" added successfully!`);
@@ -31,9 +36,7 @@ const CategoriesAdd = ({ onAdded }) => {
 
   return (
     <div className="p-4 max-w-md">
-      <h2 className="text-2xl font-bold mb-4 text-amber-700">
-        Add Category
-      </h2>
+      <h2 className="text-2xl font-bold mb-4 text-amber-700">Add Category</h2>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-2">
         <input

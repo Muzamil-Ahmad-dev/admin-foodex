@@ -1,10 +1,7 @@
  import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { fetchCategories } from "../../features/categories/category.api";
 
 const CategoriesList = () => {
-  const { user } = useSelector((state) => state.auth);
-
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -23,25 +20,11 @@ const CategoriesList = () => {
   };
 
   useEffect(() => {
-    if (user) {
-      loadCategories(); // ✅ wait for login
-    } else {
-      setLoading(false);
-    }
-  }, [user]);
+    loadCategories(); // fetch categories regardless of login
+  }, []);
 
-  if (!user)
-    return (
-      <p className="text-yellow-600">
-        Please login to view categories.
-      </p>
-    );
-
-  if (loading)
-    return <p className="text-gray-500">Loading categories...</p>;
-
-  if (error)
-    return <p className="text-red-500">{error}</p>;
+  if (loading) return <p className="text-gray-500">Loading categories...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
 
   return (
     <div className="p-4">
