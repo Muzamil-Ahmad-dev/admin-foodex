@@ -1,7 +1,7 @@
  // src/features/auth/auth.api.js
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_URL = import.meta.env.VITE_API_URL || " https://foodex-backend--muzamilsakhi079.replit.app/api";
 
 // Create axios instance
 const axiosInstance = axios.create({
