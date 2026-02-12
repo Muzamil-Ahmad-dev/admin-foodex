@@ -1,6 +1,5 @@
- // src/pages/categories/Add.jsx
-import React, { useState } from "react";
-import { createCategory } from "../../features/categories/category.api";
+ import React, { useState } from "react";
+import { createCategory } from "../../features/categories/categoriesApi";
 
 const CategoriesAdd = ({ onAdded }) => {
   const [name, setName] = useState("");
@@ -14,11 +13,11 @@ const CategoriesAdd = ({ onAdded }) => {
 
     try {
       setLoading(true);
-      const newCategory = await createCategory({ name });
+      const newCategory = await createCategory({ name }); // ✅ cookies handle auth
       setName("");
       setError("");
       setSuccess(`Category "${newCategory.name}" added successfully!`);
-      if (onAdded) onAdded(newCategory); // optional callback to refresh list
+      if (onAdded) onAdded(newCategory);
     } catch (err) {
       setError(err.response?.data?.message || err.message);
       setSuccess("");
