@@ -24,22 +24,24 @@ import OrdersPage from "../pages/orders/Orders";
 import LoginPage from "../features/auth/LoginPage";
 import AdminRegisterPage from "../features/auth/AdminRegisterPage";
 
-// Protected Route
+// Protected Route for Admin
 const AdminRoute = ({ children }) => {
   const { user } = useSelector((state) => state.auth);
+
   if (!user) return <Navigate to="/admin" replace />;
   if (user.role !== "admin") return <Navigate to="/" replace />;
+
   return children;
 };
 
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* PUBLIC ROUTES */}
+      {/* PUBLIC ADMIN LOGIN/REGISTER */}
       <Route path="/admin" element={<LoginPage />} />
       <Route path="/admin/register" element={<AdminRegisterPage />} />
 
-      {/* PROTECTED ADMIN DASHBOARD ROUTES */}
+      {/* PROTECTED ADMIN DASHBOARD */}
       <Route
         path="/"
         element={
@@ -51,13 +53,15 @@ const AppRoutes = () => {
         <Route path="dashboard" element={<Dashboard />} />
 
         {/* Products */}
-        <Route path="products" element={<Products />}>
+        <Route path="products">
+          <Route index element={<Products />} />
           <Route path="add" element={<AddFood />} />
           <Route path="list" element={<FoodList />} />
         </Route>
 
         {/* Categories */}
-        <Route path="categories" element={<CategoriesPage />}>
+        <Route path="categories">
+          <Route index element={<CategoriesPage />} />
           <Route path="add" element={<CategoriesAdd />} />
           <Route path="list" element={<CategoriesList />} />
         </Route>
@@ -68,8 +72,10 @@ const AppRoutes = () => {
         <Route path="orders" element={<OrdersPage />} />
       </Route>
 
-      {/* REDIRECTS */}
+      {/* Redirect root to dashboard for logged-in admin */}
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+      {/* Catch-all 404 redirect */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
