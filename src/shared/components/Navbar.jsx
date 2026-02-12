@@ -1,39 +1,18 @@
- import { FaBell, FaUserCircle, FaBars } from "react-icons/fa";
+ import { FaBell, FaUserCircle, FaBars, FaSignOutAlt } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import axios from "axios";
-
-const BASE_URL = "https://foodex-backend--muzamilsakhi079.replit.app/api";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { logout } from "../../features/auth/authSlice";
 
 const Navbar = ({ menuOpen, setMenuOpen }) => {
-  const [admin, setAdmin] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
 
-  useEffect(() => {
-    const fetchAdmin = async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get(`${BASE_URL}/auth/admin/dashboard`, {
-          withCredentials: true, // ✅ cookies automatically sent
-        });
-
-        // ✅ Use admin info directly from response
-        if (res.data.admin && res.data.admin.role === "admin") {
-          setAdmin(res.data.admin);
-        } else {
-          setAdmin(null);
-        }
-      } catch (err) {
-        setAdmin(null);
-        console.error("Admin fetch error:", err.response?.data || err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAdmin();
-  }, []);
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/admin");
+  };
 
   return (
     <div className="w-full bg-[#2D1B0E]/90 backdrop-blur-sm border-b border-amber-900/30 shadow sticky top-0 z-50">
@@ -65,10 +44,19 @@ const Navbar = ({ menuOpen, setMenuOpen }) => {
               <FaUserCircle size={26} />
             </motion.div>
 
-            {!loading && admin ? (
-              <span className="text-amber-400 font-semibold hidden sm:inline">
-                {admin.name}
-              </span>
+            {user ? (
+              <>
+                <span className="text-amber-400 font-semibold hidden sm:inline">
+                  {user.name}
+                </span>
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  onClick={handleLogout}
+                  className="text-red-500 font-semibold hidden sm:inline ml-2 flex items-center gap-1 hover:underline"
+                >
+                  <FaSignOutAlt /> Logout
+                </motion.button>
+              </>
             ) : (
               <Link
                 to="/admin"

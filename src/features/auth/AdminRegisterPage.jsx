@@ -1,28 +1,33 @@
- // src/features/auth/LoginPage.jsx
+ // src/features/auth/AdminRegisterPage.jsx
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "./authSlice";
+import { register } from "./authSlice";
 import { useNavigate, Link } from "react-router-dom";
 
-const LoginPage = () => {
+const AdminRegisterPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error, user } = useSelector((state) => state.auth);
+  const { loading, error } = useSelector((state) => state.auth);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "admin",
+  });
+
+  const handleChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await dispatch(login({ email, password }));
+      const res = await dispatch(register(formData));
       if (res.payload?.user?.role === "admin") {
-        navigate("/dashboard"); // Use /dashboard as route inside AdminLayout
-      } else {
-        navigate("/user/profile"); // Non-admin users
+        navigate("/dashboard"); // Redirect to dashboard after successful registration
       }
     } catch (err) {
-      console.error("Login failed:", err);
+      console.error("Registration failed:", err);
     }
   };
 
@@ -30,22 +35,32 @@ const LoginPage = () => {
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-amber-400 via-orange-500 to-amber-600">
       <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
         <h2 className="text-3xl font-bold text-center mb-6 text-amber-700">
-          Admin Login
+          Admin Registration
         </h2>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="Full Name"
+            required
+            className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400"
+          />
+          <input
+            name="email"
             type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={formData.email}
+            onChange={handleChange}
             placeholder="Email"
             required
             className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400"
           />
           <input
+            name="password"
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={formData.password}
+            onChange={handleChange}
             placeholder="Password"
             required
             className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400"
@@ -56,20 +71,22 @@ const LoginPage = () => {
             disabled={loading}
             className="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 rounded transition duration-200"
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading ? "Registering..." : "Register"}
           </button>
 
-          {error && <p className="text-red-500 text-sm mt-2 text-center">{error}</p>}
+          {error && (
+            <p className="text-red-500 text-sm mt-2 text-center">{error}</p>
+          )}
         </form>
 
-        {/* Registration link */}
+        {/* Login link */}
         <p className="text-center text-sm mt-4 text-gray-600">
-          Don't have an account?{" "}
+          Already have an account?{" "}
           <Link
-            to="/admin/register"
+            to="/admin"
             className="text-amber-600 font-semibold hover:underline"
           >
-            Register
+            Login
           </Link>
         </p>
       </div>
@@ -77,4 +94,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default AdminRegisterPage;
