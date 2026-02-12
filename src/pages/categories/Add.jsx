@@ -1,5 +1,5 @@
  import React, { useState } from "react";
-import { createCategory } from "../../features/categories/categoriesApi";
+import { createCategory } from "../../features/categories/category.api";
 
 const CategoriesAdd = ({ onAdded }) => {
   const [name, setName] = useState("");
