@@ -1,34 +1,52 @@
  import axios from "axios";
 
 const BASE_URL = "https://foodex-backend--muzamilsakhi079.replit.app/api";
-const CATEGORIES_URL = `${BASE_URL}/categories`;
 
-// Fetch categories (admin protected or cookie protected)
+// ✅ Create axios instance (VERY IMPORTANT)
+const api = axios.create({
+  baseURL: BASE_URL,
+  withCredentials: true, // 🔥 Always send cookies automatically
+});
+
+// ---------------------------
+// Fetch categories
 export const fetchCategories = async () => {
   try {
-    const res = await axios.get(CATEGORIES_URL, {
-      withCredentials: true, // ✅ IMPORTANT (same as SupportChat)
-    });
+    const res = await api.get("/categories");
     return res.data.data;
   } catch (err) {
     console.error(
-      "Failed to fetch categories:",
+      "Fetch categories error:",
       err.response?.data?.message || err.message
     );
     throw err;
   }
 };
 
-// Create new category (admin only)
+// ---------------------------
+// Create category (admin only)
 export const createCategory = async (categoryData) => {
   try {
-    const res = await axios.post(CATEGORIES_URL, categoryData, {
-      withCredentials: true, // ✅ IMPORTANT
-    });
+    const res = await api.post("/categories", categoryData);
     return res.data.data;
   } catch (err) {
     console.error(
-      "Failed to create category:",
+      "Create category error:",
+      err.response?.data?.message || err.message
+    );
+    throw err;
+  }
+};
+
+// ---------------------------
+// Delete category (optional future use)
+export const deleteCategory = async (id) => {
+  try {
+    const res = await api.delete(`/categories/${id}`);
+    return res.data;
+  } catch (err) {
+    console.error(
+      "Delete category error:",
       err.response?.data?.message || err.message
     );
     throw err;
