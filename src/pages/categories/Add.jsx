@@ -21,7 +21,7 @@ const CategoriesAdd = ({ onAdded }) => {
       setError("");
       setSuccess("");
 
-      const newCategory = await createCategory({ name }, user.token); // pass token
+      const newCategory = await createCategory({ name });
 
       setName("");
       setSuccess(`Category "${newCategory.name}" added successfully!`);

@@ -2,23 +2,20 @@
 
 const BASE_URL = "https://foodex-backend--muzamilsakhi079.replit.app/api";
 
-// ✅ Create axios instance (VERY IMPORTANT)
+// ✅ Axios instance with cookies
 const api = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true, // 🔥 Always send cookies automatically
+  withCredentials: true, // browser automatically sends cookies
 });
 
 // ---------------------------
-// Fetch categories
+// Fetch all categories (public)
 export const fetchCategories = async () => {
   try {
     const res = await api.get("/categories");
     return res.data.data;
   } catch (err) {
-    console.error(
-      "Fetch categories error:",
-      err.response?.data?.message || err.message
-    );
+    console.error("Fetch categories error:", err.response?.data?.message || err.message);
     throw err;
   }
 };
@@ -30,25 +27,33 @@ export const createCategory = async (categoryData) => {
     const res = await api.post("/categories", categoryData);
     return res.data.data;
   } catch (err) {
-    console.error(
-      "Create category error:",
-      err.response?.data?.message || err.message
-    );
+    console.error("Create category error:", err.response?.data?.message || err.message);
     throw err;
   }
 };
 
 // ---------------------------
-// Delete category (optional future use)
+// Update category (admin only)
+export const updateCategory = async (id, categoryData) => {
+  try {
+    const res = await api.put(`/categories/${id}`, categoryData);
+    return res.data.data;
+  } catch (err) {
+    console.error("Update category error:", err.response?.data?.message || err.message);
+    throw err;
+  }
+};
+
+// ---------------------------
+// Delete category (admin only)
 export const deleteCategory = async (id) => {
   try {
     const res = await api.delete(`/categories/${id}`);
     return res.data;
   } catch (err) {
-    console.error(
-      "Delete category error:",
-      err.response?.data?.message || err.message
-    );
+    console.error("Delete category error:", err.response?.data?.message || err.message);
     throw err;
   }
 };
+
+export default api;
