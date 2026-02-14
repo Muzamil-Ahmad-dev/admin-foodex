@@ -1,5 +1,4 @@
- // src/features/auth/AdminRegisterPage.jsx
-import React, { useState } from "react";
+ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { register } from "./authSlice";
 import { useNavigate, Link } from "react-router-dom";
@@ -7,7 +6,7 @@ import { useNavigate, Link } from "react-router-dom";
 const AdminRegisterPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error } = useSelector((state) => state.auth);
+  const { loading, error, user } = useSelector((state) => state.auth);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -21,15 +20,18 @@ const AdminRegisterPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const res = await dispatch(register(formData));
-      if (res.payload?.user?.role === "admin") {
-        navigate("/dashboard"); // Redirect to dashboard after successful registration
-      }
-    } catch (err) {
-      console.error("Registration failed:", err);
-    }
+    // Dispatch registration thunk
+    dispatch(register(formData));
   };
+
+  // Navigate automatically after successful registration
+  useEffect(() => {
+    if (user?.role === "admin") {
+      navigate("/dashboard"); // Admin dashboard
+    } else if (user) {
+      navigate("/user/profile"); // Non-admin users
+    }
+  }, [user, navigate]);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-amber-400 via-orange-500 to-amber-600">
@@ -79,7 +81,6 @@ const AdminRegisterPage = () => {
           )}
         </form>
 
-        {/* Login link */}
         <p className="text-center text-sm mt-4 text-gray-600">
           Already have an account?{" "}
           <Link
