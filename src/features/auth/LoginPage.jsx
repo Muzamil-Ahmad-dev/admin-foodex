@@ -1,29 +1,26 @@
  import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "./authSlice";
+import { adminLogin } from "./authSlice";
 import { useNavigate, Link } from "react-router-dom";
 
 const LoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error, user } = useSelector((state) => state.auth);
+  const { loading, error, admin } = useSelector((state) => state.admin);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(login({ email, password }));
+    dispatch(adminLogin({ email, password }));
   };
 
-  // Navigate automatically after successful login
   useEffect(() => {
-    if (user?.role === "admin") {
-      navigate("/dashboard"); // Admin dashboard
-    } else if (user) {
-      navigate("/user/profile"); // Non-admin users
+    if (admin) {
+      navigate("/dashboard");
     }
-  }, [user, navigate]);
+  }, [admin, navigate]);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-amber-400 via-orange-500 to-amber-600">
@@ -58,9 +55,7 @@ const LoginPage = () => {
             {loading ? "Logging in..." : "Login"}
           </button>
 
-          {error && (
-            <p className="text-red-500 text-sm mt-2 text-center">{error}</p>
-          )}
+          {error && <p className="text-red-500 text-sm mt-2 text-center">{error}</p>}
         </form>
 
         <p className="text-center text-sm mt-4 text-gray-600">

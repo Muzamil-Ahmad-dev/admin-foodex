@@ -1,12 +1,12 @@
  import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { register } from "./authSlice";
+import { adminRegister } from "./authSlice";
 import { useNavigate, Link } from "react-router-dom";
 
 const AdminRegisterPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error, user } = useSelector((state) => state.auth);
+  const { loading, error, admin } = useSelector((state) => state.admin);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -18,20 +18,16 @@ const AdminRegisterPage = () => {
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    // Dispatch registration thunk
-    dispatch(register(formData));
+    dispatch(adminRegister(formData));
   };
 
-  // Navigate automatically after successful registration
   useEffect(() => {
-    if (user?.role === "admin") {
-      navigate("/dashboard"); // Admin dashboard
-    } else if (user) {
-      navigate("/user/profile"); // Non-admin users
+    if (admin) {
+      navigate("/dashboard"); // Admin dashboard only
     }
-  }, [user, navigate]);
+  }, [admin, navigate]);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-amber-400 via-orange-500 to-amber-600">
@@ -76,9 +72,7 @@ const AdminRegisterPage = () => {
             {loading ? "Registering..." : "Register"}
           </button>
 
-          {error && (
-            <p className="text-red-500 text-sm mt-2 text-center">{error}</p>
-          )}
+          {error && <p className="text-red-500 text-sm mt-2 text-center">{error}</p>}
         </form>
 
         <p className="text-center text-sm mt-4 text-gray-600">

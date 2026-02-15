@@ -2,15 +2,15 @@
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { logout } from "../../features/auth/authSlice";
+import { adminLogout } from "../../features/auth/authSlice";
 
 const Navbar = ({ menuOpen, setMenuOpen }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user } = useSelector((state) => state.auth);
+  const { admin } = useSelector((state) => state.admin);
 
   const handleLogout = () => {
-    dispatch(logout());
+    dispatch(adminLogout());
     navigate("/admin");
   };
 
@@ -32,23 +32,30 @@ const Navbar = ({ menuOpen, setMenuOpen }) => {
           </h2>
         </div>
 
-        {/* Right: Notification + Admin/User */}
+        {/* Right: Notification + Admin */}
         <div className="flex items-center gap-4 lg:gap-6">
-          <motion.div whileHover={{ scale: 1.2 }} className="relative cursor-pointer text-amber-400">
+          <motion.div
+            whileHover={{ scale: 1.2 }}
+            className="relative cursor-pointer text-amber-400"
+          >
             <FaBell size={22} />
             <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse" />
           </motion.div>
 
           <div className="flex items-center gap-2">
-            <motion.div whileHover={{ scale: 1.2, rotate: 10 }} className="cursor-pointer text-amber-400">
+            <motion.div
+              whileHover={{ scale: 1.2, rotate: 10 }}
+              className="cursor-pointer text-amber-400"
+            >
               <FaUserCircle size={26} />
             </motion.div>
 
-            {user ? (
+            {admin ? (
               <>
                 <span className="text-amber-400 font-semibold hidden sm:inline">
-                  {user.name}
+                  {admin.name}
                 </span>
+
                 <motion.button
                   whileTap={{ scale: 0.9 }}
                   onClick={handleLogout}

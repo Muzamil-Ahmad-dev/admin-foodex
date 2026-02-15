@@ -1,36 +1,37 @@
- // src/features/auth/auth.api.js
-import axios from "axios";
+ import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "https://foodex-backend--muzamilsakhi079.replit.app/api";
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://foodex-backend--muzamilsakhi079.replit.app/api";
 
-// Create axios instance
-const axiosInstance = axios.create({
+// Admin axios instance
+const adminAxios = axios.create({
   baseURL: API_URL,
-  withCredentials: true, // send cookies automatically
+  withCredentials: true, // REQUIRED for httpOnly cookies
 });
 
-// Optional: attach access token (memory only)
-export const setAccessToken = (token) => {
-  axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-};
+/* ======================
+   ADMIN AUTH APIs
+====================== */
 
-// -------------------
-// Auth APIs
-// -------------------
-export const loginUser = (data) => axiosInstance.post("/auth/login", data);
-export const registerUser = (data) => axiosInstance.post("/auth/register", data);
-export const logoutUser = () => axiosInstance.post("/auth/logout");
-export const refreshAccessToken = async () => {
-  const response = await axiosInstance.post("/auth/refresh");
-  // optional: update memory header if you want
-  setAccessToken(response.data.accessToken);
-  return response.data;
-};
+// Admin Register (role enforced in frontend + backend)
+export const adminRegisterApi = (data) =>
+  adminAxios.post("/auth/register", {
+    ...data,
+    role: "admin", // hard-enforced
+  });
 
-// ✅ NEW: Fetch current logged-in user
-export const getCurrentUser = () => axiosInstance.get("/auth/user/profile");
+// Admin Login
+export const adminLoginApi = (data) =>
+  adminAxios.post("/auth/login", data);
 
-// -------------------
-// Default export axios instance
-// -------------------
-export default axiosInstance;
+// Admin Logout
+export const adminLogoutApi = () =>
+  adminAxios.post("/auth/logout");
+ 
+
+// Admin Profile (protected)
+export const adminProfileApi = () =>
+  adminAxios.get("/admin/dashboard");
+
+export default adminAxios;
