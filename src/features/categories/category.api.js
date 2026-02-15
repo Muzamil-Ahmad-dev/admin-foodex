@@ -1,46 +1,39 @@
- // src/features/categories/categories.api.js
-import adminAxios from "../auth/auth.api.js"; // <- reuse the admin axios instance
+ import adminAxios from "../auth/auth.api.js";
 
-// ---------------------------
-// PUBLIC API (no auth required)
+/* ============================
+   PUBLIC
+============================ */
+
+// Fetch all categories (public)
 export const fetchCategories = async () => {
-  try {
-    const res = await adminAxios.get("/categories"); // still works for public
-    return res.data.data;
-  } catch (err) {
-    console.error("Fetch categories error:", err.response?.data?.message || err.message);
-    throw err;
-  }
+  const res = await adminAxios.get("/categories");
+  return res.data.data;
 };
 
-// ---------------------------
-// ADMIN-ONLY API
-export const createCategory = async (categoryData) => {
-  try {
-    const res = await adminAxios.post("/categories", categoryData);
-    return res.data.data;
-  } catch (err) {
-    console.error("Create category error:", err.response?.data?.message || err.message);
-    throw err;
-  }
+// Fetch category by slug (public)
+export const fetchCategoryBySlug = async (slug) => {
+  const res = await adminAxios.get(`/categories/${slug}`);
+  return res.data.data;
 };
 
-export const updateCategory = async (id, categoryData) => {
-  try {
-    const res = await adminAxios.put(`/categories/${id}`, categoryData);
-    return res.data.data;
-  } catch (err) {
-    console.error("Update category error:", err.response?.data?.message || err.message);
-    throw err;
-  }
+/* ============================
+   ADMIN ONLY
+============================ */
+
+// Create category
+export const createCategory = async (data) => {
+  const res = await adminAxios.post("/categories", data);
+  return res.data.data;
 };
 
+// Update category
+export const updateCategory = async (id, data) => {
+  const res = await adminAxios.put(`/categories/${id}`, data);
+  return res.data.data;
+};
+
+// Delete category
 export const deleteCategory = async (id) => {
-  try {
-    const res = await adminAxios.delete(`/categories/${id}`);
-    return res.data;
-  } catch (err) {
-    console.error("Delete category error:", err.response?.data?.message || err.message);
-    throw err;
-  }
+  const res = await adminAxios.delete(`/categories/${id}`);
+  return res.data;
 };

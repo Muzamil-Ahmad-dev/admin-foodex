@@ -6,7 +6,7 @@ import AdminLayout from "../shared/layout/AdminLayout";
 import Dashboard from "../pages/dashboard/Dashboard";
 
 // Products
-import Products from "../pages/products/Products";
+import ProductsPage from "../pages/products/Products";
 import AddFood from "../pages/products/Add";
 import FoodList from "../pages/products/List";
 
@@ -20,33 +20,33 @@ import Users from "../pages/users/Users";
 import ContactPage from "../pages/contact/Contact";
 import OrdersPage from "../pages/orders/Orders";
 
-// Login/Register
+// Auth
 import LoginPage from "../features/auth/LoginPage";
 import AdminRegisterPage from "../features/auth/AdminRegisterPage";
 
-// ------------------------------
-// Protected Route for Admin
-// ------------------------------
+/* ==========================
+   Admin Protected Route
+========================== */
 const AdminRoute = ({ children }) => {
   const { admin } = useSelector((state) => state.admin) || {};
 
-  if (!admin) return <Navigate to="/admin" replace />; // Not logged in
-  if (admin.role !== "admin") return <Navigate to="/" replace />; // Wrong role
+  if (!admin) return <Navigate to="/admin" replace />;
+  if (admin.role !== "admin") return <Navigate to="/" replace />;
 
   return children;
 };
 
-// ------------------------------
-// App Routes
-// ------------------------------
+/* ==========================
+   App Routes
+========================== */
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* PUBLIC ADMIN LOGIN/REGISTER */}
+      {/* Public Admin Auth */}
       <Route path="/admin" element={<LoginPage />} />
       <Route path="/admin/register" element={<AdminRegisterPage />} />
 
-      {/* PROTECTED ADMIN DASHBOARD */}
+      {/* Admin Protected Area */}
       <Route
         path="/"
         element={
@@ -60,7 +60,7 @@ const AppRoutes = () => {
 
         {/* Products */}
         <Route path="products">
-          <Route index element={<Products />} />
+          <Route index element={<ProductsPage />} />
           <Route path="add" element={<AddFood />} />
           <Route path="list" element={<FoodList />} />
         </Route>
@@ -72,17 +72,14 @@ const AppRoutes = () => {
           <Route path="list" element={<CategoriesList />} />
         </Route>
 
-        {/* Other admin pages */}
+        {/* Other pages */}
         <Route path="users" element={<Users />} />
         <Route path="orders" element={<OrdersPage />} />
         <Route path="contact" element={<ContactPage />} />
       </Route>
 
-      {/* Redirect root "/" to dashboard if logged in */}
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-
-      {/* Catch-all redirect */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      {/* Catch all */}
+      <Route path="*" element={<Navigate to="/admin" replace />} />
     </Routes>
   );
 };
