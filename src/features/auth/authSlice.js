@@ -39,9 +39,33 @@ export const adminLogin = createAsyncThunk(
 );
 
 // Admin Logout
-export const adminLogout = createAsyncThunk("admin/logout", async () => {
-  await axiosInstance.post("/auth/logout"); // clears cookies
-});
+export const adminLogout = createAsyncThunk(
+  "admin/logout",
+  async (_, { rejectWithValue }) => {
+    try {
+      await axiosInstance.post("/auth/logout"); // clears httpOnly cookies
+      return true;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Logout failed");
+    }
+  }
+);
+
+// Fetch current admin profile (optional, restores session on refresh)
+export const fetchAdminProfile = createAsyncThunk(
+  "admin/fetchProfile",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.get("/admin/dashboard"); // protected route
+      if (res.data.admin.role !== "admin") {
+        return rejectWithValue("Not an admin");
+      }
+      return res.data.admin;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Failed to fetch profile");
+    }
+  }
+);
 
 // ------------------
 // Slice
@@ -85,8 +109,32 @@ const adminSlice = createSlice({
       })
 
       // Logout
+      .addCase(adminLogout.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(adminLogout.fulfilled, (state) => {
+        state.loading = false;
         state.admin = null;
+      })
+      .addCase(adminLogout.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Fetch Admin Profile
+      .addCase(fetchAdminProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAdminProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.admin = action.payload;
+      })
+      .addCase(fetchAdminProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.admin = null;
+        state.error = action.payload;
       });
   },
 });

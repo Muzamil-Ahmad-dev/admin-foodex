@@ -1,6 +1,6 @@
  import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { adminRegister } from "./authSlice";
+import { adminRegister } from "./authSlice"; // make sure you import correct slice
 import { useNavigate, Link } from "react-router-dom";
 
 const AdminRegisterPage = () => {
@@ -12,20 +12,28 @@ const AdminRegisterPage = () => {
     name: "",
     email: "",
     password: "",
-    role: "admin",
+    role: "admin", // always enforced
   });
+
+  const [success, setSuccess] = useState(null);
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(adminRegister(formData));
+    const resultAction = await dispatch(adminRegister(formData));
+
+    if (adminRegister.fulfilled.match(resultAction)) {
+      setSuccess("Admin registered successfully!");
+      navigate("/dashboard"); // redirect to dashboard
+    }
   };
 
   useEffect(() => {
+    // If already logged in as admin, redirect
     if (admin) {
-      navigate("/dashboard"); // Admin dashboard only
+      navigate("/dashboard");
     }
   }, [admin, navigate]);
 
@@ -72,7 +80,12 @@ const AdminRegisterPage = () => {
             {loading ? "Registering..." : "Register"}
           </button>
 
-          {error && <p className="text-red-500 text-sm mt-2 text-center">{error}</p>}
+          {error && (
+            <p className="text-red-500 text-sm mt-2 text-center">{error}</p>
+          )}
+          {success && (
+            <p className="text-green-500 text-sm mt-2 text-center">{success}</p>
+          )}
         </form>
 
         <p className="text-center text-sm mt-4 text-gray-600">

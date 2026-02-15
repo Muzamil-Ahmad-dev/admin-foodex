@@ -2,16 +2,16 @@
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { adminLogout } from "../../features/auth/authSlice";
+import { adminLogout } from "../../features/auth/authSlice"; // updated
 
 const Navbar = ({ menuOpen, setMenuOpen }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { admin } = useSelector((state) => state.admin);
 
-  const handleLogout = () => {
-    dispatch(adminLogout());
-    navigate("/admin");
+  const handleLogout = async () => {
+    await dispatch(adminLogout());
+    navigate("/admin"); // redirect to login
   };
 
   return (
@@ -34,28 +34,19 @@ const Navbar = ({ menuOpen, setMenuOpen }) => {
 
         {/* Right: Notification + Admin */}
         <div className="flex items-center gap-4 lg:gap-6">
-          <motion.div
-            whileHover={{ scale: 1.2 }}
-            className="relative cursor-pointer text-amber-400"
-          >
+          <motion.div whileHover={{ scale: 1.2 }} className="relative cursor-pointer text-amber-400">
             <FaBell size={22} />
             <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse" />
           </motion.div>
 
           <div className="flex items-center gap-2">
-            <motion.div
-              whileHover={{ scale: 1.2, rotate: 10 }}
-              className="cursor-pointer text-amber-400"
-            >
+            <motion.div whileHover={{ scale: 1.2, rotate: 10 }} className="cursor-pointer text-amber-400">
               <FaUserCircle size={26} />
             </motion.div>
 
             {admin ? (
               <>
-                <span className="text-amber-400 font-semibold hidden sm:inline">
-                  {admin.name}
-                </span>
-
+                <span className="text-amber-400 font-semibold hidden sm:inline">{admin.name}</span>
                 <motion.button
                   whileTap={{ scale: 0.9 }}
                   onClick={handleLogout}
@@ -65,10 +56,7 @@ const Navbar = ({ menuOpen, setMenuOpen }) => {
                 </motion.button>
               </>
             ) : (
-              <Link
-                to="/admin"
-                className="text-amber-400 font-semibold hover:underline hidden sm:inline"
-              >
+              <Link to="/admin" className="text-amber-400 font-semibold hover:underline hidden sm:inline">
                 Login
               </Link>
             )}

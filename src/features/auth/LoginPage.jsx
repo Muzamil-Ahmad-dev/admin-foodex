@@ -1,6 +1,6 @@
  import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { adminLogin } from "./authSlice";
+import { adminLogin } from "./authSlice"; // ensure correct slice import
 import { useNavigate, Link } from "react-router-dom";
 
 const LoginPage = () => {
@@ -10,13 +10,21 @@ const LoginPage = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [success, setSuccess] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(adminLogin({ email, password }));
+
+    const resultAction = await dispatch(adminLogin({ email, password }));
+
+    if (adminLogin.fulfilled.match(resultAction)) {
+      setSuccess("Login successful!");
+      navigate("/dashboard"); // redirect to admin dashboard
+    }
   };
 
   useEffect(() => {
+    // Redirect immediately if already logged in
     if (admin) {
       navigate("/dashboard");
     }
@@ -56,6 +64,7 @@ const LoginPage = () => {
           </button>
 
           {error && <p className="text-red-500 text-sm mt-2 text-center">{error}</p>}
+          {success && <p className="text-green-500 text-sm mt-2 text-center">{success}</p>}
         </form>
 
         <p className="text-center text-sm mt-4 text-gray-600">
