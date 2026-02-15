@@ -1,16 +1,17 @@
  import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { createCategory } from "../../features/categories/category.api";
+import { createCategory } from "../../features/categories/category.api"; // updated import
 
 const CategoriesAdd = ({ onAdded }) => {
-  const { user } = useSelector((state) => state.auth);
+  const { admin } = useSelector((state) => state.admin); // use admin from state
 
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
-  if (!user) return <p className="text-yellow-600">Please login to add a category.</p>;
+  if (!admin) 
+    return <p className="text-yellow-600">Please login as admin to add a category.</p>;
 
   const handleSubmit = async (e) => {
     e.preventDefault();

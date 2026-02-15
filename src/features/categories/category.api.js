@@ -1,18 +1,11 @@
- import axios from "axios";
-
-const BASE_URL = "https://foodex-backend--muzamilsakhi079.replit.app/api";
-
-// ✅ Axios instance with cookies
-const api = axios.create({
-  baseURL: BASE_URL,
-  withCredentials: true, // browser automatically sends cookies
-});
+ // src/features/categories/categories.api.js
+import adminAxios from "../auth/auth.api.js"; // <- reuse the admin axios instance
 
 // ---------------------------
-// Fetch all categories (public)
+// PUBLIC API (no auth required)
 export const fetchCategories = async () => {
   try {
-    const res = await api.get("/categories");
+    const res = await adminAxios.get("/categories"); // still works for public
     return res.data.data;
   } catch (err) {
     console.error("Fetch categories error:", err.response?.data?.message || err.message);
@@ -21,10 +14,10 @@ export const fetchCategories = async () => {
 };
 
 // ---------------------------
-// Create category (admin only)
+// ADMIN-ONLY API
 export const createCategory = async (categoryData) => {
   try {
-    const res = await api.post("/categories", categoryData);
+    const res = await adminAxios.post("/categories", categoryData);
     return res.data.data;
   } catch (err) {
     console.error("Create category error:", err.response?.data?.message || err.message);
@@ -32,11 +25,9 @@ export const createCategory = async (categoryData) => {
   }
 };
 
-// ---------------------------
-// Update category (admin only)
 export const updateCategory = async (id, categoryData) => {
   try {
-    const res = await api.put(`/categories/${id}`, categoryData);
+    const res = await adminAxios.put(`/categories/${id}`, categoryData);
     return res.data.data;
   } catch (err) {
     console.error("Update category error:", err.response?.data?.message || err.message);
@@ -44,16 +35,12 @@ export const updateCategory = async (id, categoryData) => {
   }
 };
 
-// ---------------------------
-// Delete category (admin only)
 export const deleteCategory = async (id) => {
   try {
-    const res = await api.delete(`/categories/${id}`);
+    const res = await adminAxios.delete(`/categories/${id}`);
     return res.data;
   } catch (err) {
     console.error("Delete category error:", err.response?.data?.message || err.message);
     throw err;
   }
 };
-
-export default api;

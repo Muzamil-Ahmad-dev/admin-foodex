@@ -4,10 +4,10 @@ import {
   fetchCategories,
   deleteCategory,
   updateCategory,
-} from "../../features/categories/category.api";
+} from "../../features/categories/category.api"; // updated import
 
 const CategoriesList = () => {
-  const { user } = useSelector((state) => state.auth);
+  const { admin } = useSelector((state) => state.admin); // use admin
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -15,7 +15,7 @@ const CategoriesList = () => {
   const loadCategories = async () => {
     try {
       setLoading(true);
-      const data = await fetchCategories();
+      const data = await fetchCategories(); // public fetch
       setCategories(data);
       setError("");
     } catch (err) {
@@ -32,7 +32,7 @@ const CategoriesList = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this category?")) return;
     try {
-      await deleteCategory(id);
+      await deleteCategory(id); // uses adminAxios internally
       loadCategories();
     } catch (err) {
       alert(err.response?.data?.message || err.message);
@@ -43,13 +43,14 @@ const CategoriesList = () => {
     const newName = prompt("Enter new category name:", currentName);
     if (!newName || newName.trim() === "") return;
     try {
-      await updateCategory(id, { name: newName });
+      await updateCategory(id, { name: newName }); // uses adminAxios internally
       loadCategories();
     } catch (err) {
       alert(err.response?.data?.message || err.message);
     }
   };
 
+  if (!admin) return <p className="text-yellow-600">Please login as admin to view categories.</p>;
   if (loading) return <p className="text-gray-500">Loading categories...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
@@ -63,22 +64,20 @@ const CategoriesList = () => {
             className="bg-white p-2 rounded shadow flex justify-between items-center"
           >
             <span>{cat.name}</span>
-            {user?.role === "admin" && (
-              <span className="flex gap-2">
-                <button
-                  onClick={() => handleUpdate(cat._id, cat.name)}
-                  className="text-blue-500 hover:underline"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(cat._id)}
-                  className="text-red-500 hover:underline"
-                >
-                  Delete
-                </button>
-              </span>
-            )}
+            <span className="flex gap-2">
+              <button
+                onClick={() => handleUpdate(cat._id, cat.name)}
+                className="text-blue-500 hover:underline"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => handleDelete(cat._id)}
+                className="text-red-500 hover:underline"
+              >
+                Delete
+              </button>
+            </span>
           </li>
         ))}
       </ul>
