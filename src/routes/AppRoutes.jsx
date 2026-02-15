@@ -24,16 +24,21 @@ import OrdersPage from "../pages/orders/Orders";
 import LoginPage from "../features/auth/LoginPage";
 import AdminRegisterPage from "../features/auth/AdminRegisterPage";
 
+// ------------------------------
 // Protected Route for Admin
+// ------------------------------
 const AdminRoute = ({ children }) => {
-  const { user } = useSelector((state) => state.auth);
+  const { admin } = useSelector((state) => state.admin) || {};
 
-  if (!user) return <Navigate to="/admin" replace />;
-  if (user.role !== "admin") return <Navigate to="/" replace />;
+  if (!admin) return <Navigate to="/admin" replace />; // Not logged in
+  if (admin.role !== "admin") return <Navigate to="/" replace />; // Wrong role
 
   return children;
 };
 
+// ------------------------------
+// App Routes
+// ------------------------------
 const AppRoutes = () => {
   return (
     <Routes>
@@ -50,6 +55,7 @@ const AppRoutes = () => {
           </AdminRoute>
         }
       >
+        {/* Dashboard */}
         <Route path="dashboard" element={<Dashboard />} />
 
         {/* Products */}
@@ -68,14 +74,14 @@ const AppRoutes = () => {
 
         {/* Other admin pages */}
         <Route path="users" element={<Users />} />
-        <Route path="contact" element={<ContactPage />} />
         <Route path="orders" element={<OrdersPage />} />
+        <Route path="contact" element={<ContactPage />} />
       </Route>
 
-      {/* Redirect root to dashboard for logged-in admin */}
+      {/* Redirect root "/" to dashboard if logged in */}
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-      {/* Catch-all 404 redirect */}
+      {/* Catch-all redirect */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
