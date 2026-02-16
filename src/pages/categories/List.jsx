@@ -1,13 +1,9 @@
  import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import {
-  fetchCategories,
-  deleteCategory,
-  updateCategory,
-} from "../../features/categories/category.api"; // updated import
+import { fetchCategories, deleteCategory, updateCategory } from "../../features/categories/category.api";
 
 const CategoriesList = () => {
-  const { admin } = useSelector((state) => state.admin); // use admin
+  const { admin, accessToken } = useSelector((state) => state.admin);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -15,7 +11,7 @@ const CategoriesList = () => {
   const loadCategories = async () => {
     try {
       setLoading(true);
-      const data = await fetchCategories(); // public fetch
+      const data = await fetchCategories(); // public fetch works without token
       setCategories(data);
       setError("");
     } catch (err) {
@@ -31,8 +27,12 @@ const CategoriesList = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this category?")) return;
+
     try {
-      await deleteCategory(id); // uses adminAxios internally
+      // ensure token is stored
+      if (accessToken) sessionStorage.setItem("accessToken", accessToken);
+
+      await deleteCategory(id);
       loadCategories();
     } catch (err) {
       alert(err.response?.data?.message || err.message);
@@ -42,8 +42,11 @@ const CategoriesList = () => {
   const handleUpdate = async (id, currentName) => {
     const newName = prompt("Enter new category name:", currentName);
     if (!newName || newName.trim() === "") return;
+
     try {
-      await updateCategory(id, { name: newName }); // uses adminAxios internally
+      if (accessToken) sessionStorage.setItem("accessToken", accessToken);
+
+      await updateCategory(id, { name: newName });
       loadCategories();
     } catch (err) {
       alert(err.response?.data?.message || err.message);
@@ -64,20 +67,22 @@ const CategoriesList = () => {
             className="bg-white p-2 rounded shadow flex justify-between items-center"
           >
             <span>{cat.name}</span>
-            <span className="flex gap-2">
-              <button
-                onClick={() => handleUpdate(cat._id, cat.name)}
-                className="text-blue-500 hover:underline"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => handleDelete(cat._id)}
-                className="text-red-500 hover:underline"
-              >
-                Delete
-              </button>
-            </span>
+            {admin && (
+              <span className="flex gap-2">
+                <button
+                  onClick={() => handleUpdate(cat._id, cat.name)}
+                  className="text-blue-500 hover:underline"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(cat._id)}
+                  className="text-red-500 hover:underline"
+                >
+                  Delete
+                </button>
+              </span>
+            )}
           </li>
         ))}
       </ul>

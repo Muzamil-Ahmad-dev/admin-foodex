@@ -4,12 +4,12 @@ const API_URL = "/api"; // relative path for Vercel proxy
 
 const adminAxios = axios.create({
   baseURL: API_URL,
-  withCredentials: true, // cookie still works if possible
+  withCredentials: true, // cookies still work if present
 });
 
-// Attach access token from memory/sessionStorage for protected requests
+// Send access token from sessionStorage for admin/protected requests
 adminAxios.interceptors.request.use((config) => {
-  const token = sessionStorage.getItem("accessToken"); // store token in memory/sessionStorage
+  const token = sessionStorage.getItem("accessToken");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
