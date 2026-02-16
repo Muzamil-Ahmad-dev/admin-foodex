@@ -23,50 +23,36 @@ import OrdersPage from "../pages/orders/Orders";
 import LoginPage from "../features/auth/LoginPage";
 import AdminRegisterPage from "../features/auth/AdminRegisterPage";
 
-// Admin protected route (only dashboard)
-import { useSelector } from "react-redux";
-
-const AdminRoute = ({ children }) => {
-  const { admin } = useSelector((state) => state.admin) || {};
-  if (!admin) return <Navigate to="/admin" replace />;
-  if (admin.role !== "admin") return <Navigate to="/" replace />;
-  return children;
-};
-
+/* ==========================
+   All Routes Public
+========================== */
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Public Admin Auth */}
+      {/* Auth pages (optional) */}
       <Route path="/admin" element={<LoginPage />} />
       <Route path="/admin/register" element={<AdminRegisterPage />} />
 
-      {/* Public CRUD Pages */}
+      {/* All pages inside layout */}
       <Route path="/" element={<AdminLayout />}>
-        {/* Dashboard is protected */}
-        <Route
-          path="dashboard"
-          element={
-            <AdminRoute>
-              <Dashboard />
-            </AdminRoute>
-          }
-        />
+        {/* Dashboard - now public */}
+        <Route path="dashboard" element={<Dashboard />} />
 
-        {/* Products (public) */}
+        {/* Products */}
         <Route path="products">
           <Route index element={<ProductsPage />} />
           <Route path="add" element={<AddFood />} />
           <Route path="list" element={<FoodList />} />
         </Route>
 
-        {/* Categories (public) */}
+        {/* Categories */}
         <Route path="categories">
           <Route index element={<CategoriesPage />} />
           <Route path="add" element={<CategoriesAdd />} />
           <Route path="list" element={<CategoriesList />} />
         </Route>
 
-        {/* Other pages (public) */}
+        {/* Other pages */}
         <Route path="users" element={<Users />} />
         <Route path="orders" element={<OrdersPage />} />
         <Route path="contact" element={<ContactPage />} />
