@@ -23,9 +23,16 @@ import OrdersPage from "../pages/orders/Orders";
 import LoginPage from "../features/auth/LoginPage";
 import AdminRegisterPage from "../features/auth/AdminRegisterPage";
 
-/* ==========================
-   App Routes (All Public)
-========================== */
+// Admin protected route (only for dashboard)
+import { useSelector } from "react-redux";
+
+const AdminRoute = ({ children }) => {
+  const { admin } = useSelector((state) => state.admin) || {};
+  if (!admin) return <Navigate to="/admin" replace />;
+  if (admin.role !== "admin") return <Navigate to="/" replace />;
+  return children;
+};
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -33,33 +40,40 @@ const AppRoutes = () => {
       <Route path="/admin" element={<LoginPage />} />
       <Route path="/admin/register" element={<AdminRegisterPage />} />
 
-      {/* Admin Layout (now fully public) */}
+      {/* Public CRUD Pages */}
       <Route path="/" element={<AdminLayout />}>
-        {/* Dashboard */}
-        <Route path="dashboard" element={<Dashboard />} />
+        {/* Only dashboard is protected */}
+        <Route
+          path="dashboard"
+          element={
+            <AdminRoute>
+              <Dashboard />
+            </AdminRoute>
+          }
+        />
 
-        {/* Products */}
+        {/* Products (public CRUD) */}
         <Route path="products">
           <Route index element={<ProductsPage />} />
           <Route path="add" element={<AddFood />} />
           <Route path="list" element={<FoodList />} />
         </Route>
 
-        {/* Categories */}
+        {/* Categories (public CRUD) */}
         <Route path="categories">
           <Route index element={<CategoriesPage />} />
           <Route path="add" element={<CategoriesAdd />} />
           <Route path="list" element={<CategoriesList />} />
         </Route>
 
-        {/* Other pages */}
+        {/* Other pages (public CRUD) */}
         <Route path="users" element={<Users />} />
         <Route path="orders" element={<OrdersPage />} />
         <Route path="contact" element={<ContactPage />} />
       </Route>
 
       {/* Catch all */}
-      <Route path="*" element={<Navigate to="/admin" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };
