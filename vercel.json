@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://foodex-backend--muzamilsakhi079.replit.app/api/$1"
+    }
+  ]
+}
