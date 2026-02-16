@@ -1,6 +1,5 @@
  import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useSelector } from "react-redux";
 
 import AdminLayout from "../shared/layout/AdminLayout";
 import Dashboard from "../pages/dashboard/Dashboard";
@@ -25,19 +24,7 @@ import LoginPage from "../features/auth/LoginPage";
 import AdminRegisterPage from "../features/auth/AdminRegisterPage";
 
 /* ==========================
-   Admin Protected Route
-========================== */
-const AdminRoute = ({ children }) => {
-  const { admin } = useSelector((state) => state.admin) || {};
-
-  if (!admin) return <Navigate to="/admin" replace />;
-  if (admin.role !== "admin") return <Navigate to="/" replace />;
-
-  return children;
-};
-
-/* ==========================
-   App Routes
+   App Routes (All Public)
 ========================== */
 const AppRoutes = () => {
   return (
@@ -46,15 +33,8 @@ const AppRoutes = () => {
       <Route path="/admin" element={<LoginPage />} />
       <Route path="/admin/register" element={<AdminRegisterPage />} />
 
-      {/* Admin Protected Area */}
-      <Route
-        path="/"
-        element={
-          <AdminRoute>
-            <AdminLayout />
-          </AdminRoute>
-        }
-      >
+      {/* Admin Layout (now fully public) */}
+      <Route path="/" element={<AdminLayout />}>
         {/* Dashboard */}
         <Route path="dashboard" element={<Dashboard />} />
 

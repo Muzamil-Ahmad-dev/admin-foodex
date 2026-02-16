@@ -3,7 +3,7 @@
 const API_URL = "/api/categories"; // relative path works for Vercel
 
 // --------------------
-// Public CRUD functions
+// Public CRUD functions  
 // --------------------
 
 export const fetchCategories = async () => {
