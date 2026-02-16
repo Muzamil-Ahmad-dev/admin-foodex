@@ -11,11 +11,15 @@ export const adminRegister = createAsyncThunk(
   "admin/register",
   async (data, { rejectWithValue }) => {
     try {
-      const res = await axiosInstance.post("/auth/register", data); // role: 'admin' sent in data
+      const res = await axiosInstance.post("/auth/register", data); // include role:'admin'
       if (res.data.user.role !== "admin") {
         return rejectWithValue("Not an admin");
       }
-      return res.data.user;
+
+      // Save token in sessionStorage
+      if (res.data.token) sessionStorage.setItem("accessToken", res.data.token);
+
+      return { user: res.data.user, token: res.data.token };
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Registration failed");
     }
@@ -31,7 +35,11 @@ export const adminLogin = createAsyncThunk(
       if (res.data.user.role !== "admin") {
         return rejectWithValue("Not an admin");
       }
-      return res.data.user;
+
+      // Save token in sessionStorage
+      if (res.data.token) sessionStorage.setItem("accessToken", res.data.token);
+
+      return { user: res.data.user, token: res.data.token };
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Login failed");
     }
@@ -43,7 +51,8 @@ export const adminLogout = createAsyncThunk(
   "admin/logout",
   async (_, { rejectWithValue }) => {
     try {
-      await axiosInstance.post("/auth/logout"); // clears httpOnly cookies
+      await axiosInstance.post("/auth/logout"); // clears cookies
+      sessionStorage.removeItem("accessToken");
       return true;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Logout failed");
@@ -51,16 +60,16 @@ export const adminLogout = createAsyncThunk(
   }
 );
 
-// Fetch current admin profile (optional, restores session on refresh)
+// Fetch current admin profile (restore session)
 export const fetchAdminProfile = createAsyncThunk(
   "admin/fetchProfile",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await axiosInstance.get("/admin/dashboard"); // protected route
-      if (res.data.admin.role !== "admin") {
+      const res = await axiosInstance.get("/auth/user/profile"); // protected route
+      if (res.data.user.role !== "admin") {
         return rejectWithValue("Not an admin");
       }
-      return res.data.admin;
+      return res.data.user;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Failed to fetch profile");
     }
@@ -73,7 +82,8 @@ export const fetchAdminProfile = createAsyncThunk(
 const adminSlice = createSlice({
   name: "admin",
   initialState: {
-    admin: null, // stores admin user
+    admin: null,
+    accessToken: sessionStorage.getItem("accessToken") || null, // restore token if exists
     loading: false,
     error: null,
   },
@@ -87,7 +97,8 @@ const adminSlice = createSlice({
       })
       .addCase(adminRegister.fulfilled, (state, action) => {
         state.loading = false;
-        state.admin = action.payload;
+        state.admin = action.payload.user;
+        state.accessToken = action.payload.token;
       })
       .addCase(adminRegister.rejected, (state, action) => {
         state.loading = false;
@@ -101,7 +112,8 @@ const adminSlice = createSlice({
       })
       .addCase(adminLogin.fulfilled, (state, action) => {
         state.loading = false;
-        state.admin = action.payload;
+        state.admin = action.payload.user;
+        state.accessToken = action.payload.token;
       })
       .addCase(adminLogin.rejected, (state, action) => {
         state.loading = false;
@@ -116,6 +128,7 @@ const adminSlice = createSlice({
       .addCase(adminLogout.fulfilled, (state) => {
         state.loading = false;
         state.admin = null;
+        state.accessToken = null;
       })
       .addCase(adminLogout.rejected, (state, action) => {
         state.loading = false;
@@ -134,6 +147,8 @@ const adminSlice = createSlice({
       .addCase(fetchAdminProfile.rejected, (state, action) => {
         state.loading = false;
         state.admin = null;
+        state.accessToken = null;
+        sessionStorage.removeItem("accessToken");
         state.error = action.payload;
       });
   },
