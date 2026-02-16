@@ -23,7 +23,7 @@ import OrdersPage from "../pages/orders/Orders";
 import LoginPage from "../features/auth/LoginPage";
 import AdminRegisterPage from "../features/auth/AdminRegisterPage";
 
-// Admin protected route (only for dashboard)
+// Admin protected route (only dashboard)
 import { useSelector } from "react-redux";
 
 const AdminRoute = ({ children }) => {
@@ -42,7 +42,7 @@ const AppRoutes = () => {
 
       {/* Public CRUD Pages */}
       <Route path="/" element={<AdminLayout />}>
-        {/* Only dashboard is protected */}
+        {/* Dashboard is protected */}
         <Route
           path="dashboard"
           element={
@@ -52,21 +52,21 @@ const AppRoutes = () => {
           }
         />
 
-        {/* Products (public CRUD) */}
+        {/* Products (public) */}
         <Route path="products">
           <Route index element={<ProductsPage />} />
           <Route path="add" element={<AddFood />} />
           <Route path="list" element={<FoodList />} />
         </Route>
 
-        {/* Categories (public CRUD) */}
+        {/* Categories (public) */}
         <Route path="categories">
           <Route index element={<CategoriesPage />} />
           <Route path="add" element={<CategoriesAdd />} />
           <Route path="list" element={<CategoriesList />} />
         </Route>
 
-        {/* Other pages (public CRUD) */}
+        {/* Other pages (public) */}
         <Route path="users" element={<Users />} />
         <Route path="orders" element={<OrdersPage />} />
         <Route path="contact" element={<ContactPage />} />
