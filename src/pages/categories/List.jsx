@@ -1,9 +1,11 @@
  import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { fetchCategories, deleteCategory, updateCategory } from "../../features/categories/category.api";
+import {
+  fetchCategories,
+  deleteCategory,
+  updateCategory,
+} from "../../features/categories/category.api";
 
 const CategoriesList = () => {
-  const { admin, accessToken } = useSelector((state) => state.admin);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -11,7 +13,7 @@ const CategoriesList = () => {
   const loadCategories = async () => {
     try {
       setLoading(true);
-      const data = await fetchCategories(); // public fetch works without token
+      const data = await fetchCategories();
       setCategories(data);
       setError("");
     } catch (err) {
@@ -27,11 +29,7 @@ const CategoriesList = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this category?")) return;
-
     try {
-      // ensure token is stored
-      if (accessToken) sessionStorage.setItem("accessToken", accessToken);
-
       await deleteCategory(id);
       loadCategories();
     } catch (err) {
@@ -42,10 +40,7 @@ const CategoriesList = () => {
   const handleUpdate = async (id, currentName) => {
     const newName = prompt("Enter new category name:", currentName);
     if (!newName || newName.trim() === "") return;
-
     try {
-      if (accessToken) sessionStorage.setItem("accessToken", accessToken);
-
       await updateCategory(id, { name: newName });
       loadCategories();
     } catch (err) {
@@ -53,7 +48,6 @@ const CategoriesList = () => {
     }
   };
 
-  if (!admin) return <p className="text-yellow-600">Please login as admin to view categories.</p>;
   if (loading) return <p className="text-gray-500">Loading categories...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
@@ -67,22 +61,20 @@ const CategoriesList = () => {
             className="bg-white p-2 rounded shadow flex justify-between items-center"
           >
             <span>{cat.name}</span>
-            {admin && (
-              <span className="flex gap-2">
-                <button
-                  onClick={() => handleUpdate(cat._id, cat.name)}
-                  className="text-blue-500 hover:underline"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(cat._id)}
-                  className="text-red-500 hover:underline"
-                >
-                  Delete
-                </button>
-              </span>
-            )}
+            <span className="flex gap-2">
+              <button
+                onClick={() => handleUpdate(cat._id, cat.name)}
+                className="text-blue-500 hover:underline"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => handleDelete(cat._id)}
+                className="text-red-500 hover:underline"
+              >
+                Delete
+              </button>
+            </span>
           </li>
         ))}
       </ul>

@@ -1,17 +1,11 @@
  import React, { useState } from "react";
-import { useSelector } from "react-redux";
 import { createCategory } from "../../features/categories/category.api";
 
 const CategoriesAdd = ({ onAdded }) => {
-  const { admin, accessToken } = useSelector((state) => state.admin);
-
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
-
-  if (!admin)
-    return <p className="text-yellow-600">Please login as admin to add a category.</p>;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,9 +15,6 @@ const CategoriesAdd = ({ onAdded }) => {
       setLoading(true);
       setError("");
       setSuccess("");
-
-      // Store access token for headers
-      if (accessToken) sessionStorage.setItem("accessToken", accessToken);
 
       const newCategory = await createCategory({ name });
 
