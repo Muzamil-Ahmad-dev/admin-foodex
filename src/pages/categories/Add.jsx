@@ -1,5 +1,6 @@
  import React, { useState } from "react";
 import { createCategory } from "../../features/categories/category.api";
+import { motion } from "framer-motion";
 
 const CategoriesAdd = ({ onAdded }) => {
   const [name, setName] = useState("");
@@ -17,10 +18,8 @@ const CategoriesAdd = ({ onAdded }) => {
       setSuccess("");
 
       const newCategory = await createCategory({ name });
-
       setName("");
       setSuccess(`Category "${newCategory.name}" added successfully!`);
-
       if (onAdded) onAdded(newCategory);
     } catch (err) {
       setError(err.response?.data?.message || err.message);
@@ -30,9 +29,14 @@ const CategoriesAdd = ({ onAdded }) => {
   };
 
   return (
-    <div className="p-4 max-w-md">
-      <h2 className="text-2xl font-bold mb-4 text-amber-700">Add Category</h2>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+    <motion.div
+      className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-6 mb-8"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <h2 className="text-2xl font-bold text-amber-700 mb-4">Add Category</h2>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -42,14 +46,14 @@ const CategoriesAdd = ({ onAdded }) => {
         <button
           type="submit"
           disabled={loading}
-          className="bg-amber-500 text-white py-2 rounded hover:bg-amber-600"
+          className="bg-amber-500 hover:bg-amber-600 text-white py-2 rounded transition duration-200"
         >
           {loading ? "Adding..." : "Add Category"}
         </button>
         {error && <p className="text-red-500">{error}</p>}
         {success && <p className="text-green-600">{success}</p>}
       </form>
-    </div>
+    </motion.div>
   );
 };
 
