@@ -1,6 +1,6 @@
  import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { adminLogin } from "./authSlice"; // ensure correct slice import
+import { adminLogin } from "./authSlice"; 
 import { useNavigate, Link } from "react-router-dom";
 
 const LoginPage = () => {
@@ -18,16 +18,19 @@ const LoginPage = () => {
     const resultAction = await dispatch(adminLogin({ email, password }));
 
     if (adminLogin.fulfilled.match(resultAction)) {
+      const { accessToken, refreshToken } = resultAction.payload;
+
+      // Save tokens in sessionStorage
+      sessionStorage.setItem("accessToken", accessToken);
+      sessionStorage.setItem("refreshToken", refreshToken);
+
       setSuccess("Login successful!");
-      navigate("/dashboard"); // redirect to admin dashboard
+      navigate("/dashboard");
     }
   };
 
   useEffect(() => {
-    // Redirect immediately if already logged in
-    if (admin) {
-      navigate("/dashboard");
-    }
+    if (admin) navigate("/dashboard");
   }, [admin, navigate]);
 
   return (
@@ -69,10 +72,7 @@ const LoginPage = () => {
 
         <p className="text-center text-sm mt-4 text-gray-600">
           Don't have an account?{" "}
-          <Link
-            to="/admin/register"
-            className="text-amber-600 font-semibold hover:underline"
-          >
+          <Link to="/admin/register" className="text-amber-600 font-semibold hover:underline">
             Register
           </Link>
         </p>

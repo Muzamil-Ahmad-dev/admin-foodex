@@ -1,25 +1,12 @@
- import axios from "axios";
+ import adminAxios from "../../api/adminApi";
 
-const API_URL =
-  import.meta.env.VITE_API_URL ||
-  "https://foodex-backend--muzamilsakhi079.replit.app/api";
+/* -------------------
+   Admin Auth APIs
+------------------- */
 
-// Admin axios instance
-const adminAxios = axios.create({
-  baseURL: API_URL,
-  withCredentials: true, // REQUIRED for httpOnly cookies
-});
-
-/* ======================
-   ADMIN AUTH APIs
-====================== */
-
-// Admin Register (role enforced in frontend + backend)
+// Admin Register
 export const adminRegisterApi = (data) =>
-  adminAxios.post("/auth/register", {
-    ...data,
-    role: "admin", // hard-enforced
-  });
+  adminAxios.post("/auth/register", data);
 
 // Admin Login
 export const adminLoginApi = (data) =>
@@ -28,10 +15,7 @@ export const adminLoginApi = (data) =>
 // Admin Logout
 export const adminLogoutApi = () =>
   adminAxios.post("/auth/logout");
- 
 
-// Admin Profile (protected)
+// Fetch Admin Profile (protected)
 export const adminProfileApi = () =>
   adminAxios.get("/admin/dashboard");
-
-export default adminAxios;

@@ -1,6 +1,6 @@
  import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { adminRegister } from "./authSlice"; // make sure you import correct slice
+import { adminRegister } from "./authSlice"; 
 import { useNavigate, Link } from "react-router-dom";
 
 const AdminRegisterPage = () => {
@@ -12,7 +12,7 @@ const AdminRegisterPage = () => {
     name: "",
     email: "",
     password: "",
-    role: "admin", // always enforced
+    role: "admin", // enforced
   });
 
   const [success, setSuccess] = useState(null);
@@ -22,19 +22,23 @@ const AdminRegisterPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const resultAction = await dispatch(adminRegister(formData));
 
     if (adminRegister.fulfilled.match(resultAction)) {
+      const { accessToken, refreshToken } = resultAction.payload;
+
+      // Save tokens in sessionStorage
+      sessionStorage.setItem("accessToken", accessToken);
+      sessionStorage.setItem("refreshToken", refreshToken);
+
       setSuccess("Admin registered successfully!");
-      navigate("/dashboard"); // redirect to dashboard
+      navigate("/dashboard");
     }
   };
 
   useEffect(() => {
-    // If already logged in as admin, redirect
-    if (admin) {
-      navigate("/dashboard");
-    }
+    if (admin) navigate("/dashboard");
   }, [admin, navigate]);
 
   return (
@@ -80,20 +84,13 @@ const AdminRegisterPage = () => {
             {loading ? "Registering..." : "Register"}
           </button>
 
-          {error && (
-            <p className="text-red-500 text-sm mt-2 text-center">{error}</p>
-          )}
-          {success && (
-            <p className="text-green-500 text-sm mt-2 text-center">{success}</p>
-          )}
+          {error && <p className="text-red-500 text-sm mt-2 text-center">{error}</p>}
+          {success && <p className="text-green-500 text-sm mt-2 text-center">{success}</p>}
         </form>
 
         <p className="text-center text-sm mt-4 text-gray-600">
           Already have an account?{" "}
-          <Link
-            to="/admin"
-            className="text-amber-600 font-semibold hover:underline"
-          >
+          <Link to="/admin" className="text-amber-600 font-semibold hover:underline">
             Login
           </Link>
         </p>

@@ -1,9 +1,8 @@
- // src/features/auth/authSlice.admin.js
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axiosInstance from "./auth.api.js";
+ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { adminRegisterApi, adminLoginApi, adminLogoutApi, adminProfileApi } from "./auth.api.js";
 
 // ------------------
-// Admin Thunks
+// Async Thunks
 // ------------------
 
 // Admin Register
@@ -11,15 +10,14 @@ export const adminRegister = createAsyncThunk(
   "admin/register",
   async (data, { rejectWithValue }) => {
     try {
-      const res = await axiosInstance.post("/auth/register", data); // include role:'admin'
-      if (res.data.user.role !== "admin") {
-        return rejectWithValue("Not an admin");
-      }
+      const res = await adminRegisterApi(data);
+      const accessToken = res.headers["x-access-token"];
+      const refreshToken = res.headers["x-refresh-token"];
 
-      // Save token in sessionStorage
-      if (res.data.token) sessionStorage.setItem("accessToken", res.data.token);
+      if (accessToken) sessionStorage.setItem("accessToken", accessToken);
+      if (refreshToken) sessionStorage.setItem("refreshToken", refreshToken);
 
-      return { user: res.data.user, token: res.data.token };
+      return { user: res.data.user, accessToken, refreshToken };
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Registration failed");
     }
@@ -31,15 +29,14 @@ export const adminLogin = createAsyncThunk(
   "admin/login",
   async (credentials, { rejectWithValue }) => {
     try {
-      const res = await axiosInstance.post("/auth/login", credentials);
-      if (res.data.user.role !== "admin") {
-        return rejectWithValue("Not an admin");
-      }
+      const res = await adminLoginApi(credentials);
+      const accessToken = res.headers["x-access-token"];
+      const refreshToken = res.headers["x-refresh-token"];
 
-      // Save token in sessionStorage
-      if (res.data.token) sessionStorage.setItem("accessToken", res.data.token);
+      if (accessToken) sessionStorage.setItem("accessToken", accessToken);
+      if (refreshToken) sessionStorage.setItem("refreshToken", refreshToken);
 
-      return { user: res.data.user, token: res.data.token };
+      return { user: res.data.user, accessToken, refreshToken };
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Login failed");
     }
@@ -51,8 +48,9 @@ export const adminLogout = createAsyncThunk(
   "admin/logout",
   async (_, { rejectWithValue }) => {
     try {
-      await axiosInstance.post("/auth/logout"); // clears cookies
+      await adminLogoutApi();
       sessionStorage.removeItem("accessToken");
+      sessionStorage.removeItem("refreshToken");
       return true;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Logout failed");
@@ -60,17 +58,16 @@ export const adminLogout = createAsyncThunk(
   }
 );
 
-// Fetch current admin profile (restore session)
+// Fetch Admin Profile
 export const fetchAdminProfile = createAsyncThunk(
   "admin/fetchProfile",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await axiosInstance.get("/auth/user/profile"); // protected route
-      if (res.data.user.role !== "admin") {
-        return rejectWithValue("Not an admin");
-      }
-      return res.data.user;
+      const res = await adminProfileApi();
+      return res.data.admin || res.data.user;
     } catch (err) {
+      sessionStorage.removeItem("accessToken");
+      sessionStorage.removeItem("refreshToken");
       return rejectWithValue(err.response?.data?.message || "Failed to fetch profile");
     }
   }
@@ -83,7 +80,8 @@ const adminSlice = createSlice({
   name: "admin",
   initialState: {
     admin: null,
-    accessToken: sessionStorage.getItem("accessToken") || null, // restore token if exists
+    accessToken: sessionStorage.getItem("accessToken") || null,
+    refreshToken: sessionStorage.getItem("refreshToken") || null,
     loading: false,
     error: null,
   },
@@ -98,7 +96,8 @@ const adminSlice = createSlice({
       .addCase(adminRegister.fulfilled, (state, action) => {
         state.loading = false;
         state.admin = action.payload.user;
-        state.accessToken = action.payload.token;
+        state.accessToken = action.payload.accessToken;
+        state.refreshToken = action.payload.refreshToken;
       })
       .addCase(adminRegister.rejected, (state, action) => {
         state.loading = false;
@@ -113,7 +112,8 @@ const adminSlice = createSlice({
       .addCase(adminLogin.fulfilled, (state, action) => {
         state.loading = false;
         state.admin = action.payload.user;
-        state.accessToken = action.payload.token;
+        state.accessToken = action.payload.accessToken;
+        state.refreshToken = action.payload.refreshToken;
       })
       .addCase(adminLogin.rejected, (state, action) => {
         state.loading = false;
@@ -121,35 +121,15 @@ const adminSlice = createSlice({
       })
 
       // Logout
-      .addCase(adminLogout.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
       .addCase(adminLogout.fulfilled, (state) => {
-        state.loading = false;
         state.admin = null;
         state.accessToken = null;
-      })
-      .addCase(adminLogout.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
+        state.refreshToken = null;
       })
 
-      // Fetch Admin Profile
-      .addCase(fetchAdminProfile.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      // Fetch Profile
       .addCase(fetchAdminProfile.fulfilled, (state, action) => {
-        state.loading = false;
         state.admin = action.payload;
-      })
-      .addCase(fetchAdminProfile.rejected, (state, action) => {
-        state.loading = false;
-        state.admin = null;
-        state.accessToken = null;
-        sessionStorage.removeItem("accessToken");
-        state.error = action.payload;
       });
   },
 });

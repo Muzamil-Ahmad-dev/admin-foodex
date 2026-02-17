@@ -1,5 +1,6 @@
  import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 import AdminLayout from "../shared/layout/AdminLayout";
 import Dashboard from "../pages/dashboard/Dashboard";
@@ -24,18 +25,37 @@ import LoginPage from "../features/auth/LoginPage";
 import AdminRegisterPage from "../features/auth/AdminRegisterPage";
 
 /* ==========================
-   All Routes Public
+   Admin Protected Route
+========================== */
+const AdminRoute = ({ children }) => {
+  const { admin } = useSelector((state) => state.admin) || {};
+
+  if (!admin) return <Navigate to="/admin" replace />;
+  if (admin.role !== "admin") return <Navigate to="/" replace />;
+
+  return children;
+};
+
+/* ==========================
+   App Routes
 ========================== */
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Auth pages (optional) */}
+      {/* Public Admin Auth */}
       <Route path="/admin" element={<LoginPage />} />
       <Route path="/admin/register" element={<AdminRegisterPage />} />
 
-      {/* All pages inside layout */}
-      <Route path="/" element={<AdminLayout />}>
-        {/* Dashboard - now public */}
+      {/* Admin Protected Area */}
+      <Route
+        path="/"
+        element={
+          <AdminRoute>
+            <AdminLayout />
+          </AdminRoute>
+        }
+      >
+        {/* Dashboard */}
         <Route path="dashboard" element={<Dashboard />} />
 
         {/* Products */}
@@ -59,7 +79,7 @@ const AppRoutes = () => {
       </Route>
 
       {/* Catch all */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to="/admin" replace />} />
     </Routes>
   );
 };
