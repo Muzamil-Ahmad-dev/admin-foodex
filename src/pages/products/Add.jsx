@@ -47,23 +47,26 @@ const AddFood = () => {
   };
 
   return (
-    <div className="max-w-lg mx-auto p-4 bg-white rounded shadow">
-      <h2 className="text-2xl font-bold mb-4">Add New Food</h2>
-      <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
+    <div className="max-w-lg mx-auto p-6 bg-gradient-to-br from-amber-100 via-amber-200 to-amber-50 rounded-xl shadow-lg border border-amber-300">
+      <h2 className="text-3xl font-bold mb-6 text-amber-700 text-center">
+        Add New Food
+      </h2>
+
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <input
           name="name"
           placeholder="Name"
           value={formData.name}
           onChange={handleChange}
           required
-          className="border px-3 py-2 rounded"
+          className="border border-amber-400 px-4 py-2 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none transition"
         />
         <input
           name="description"
           placeholder="Description"
           value={formData.description}
           onChange={handleChange}
-          className="border px-3 py-2 rounded"
+          className="border border-amber-400 px-4 py-2 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none transition"
         />
         <input
           name="category"
@@ -71,7 +74,7 @@ const AddFood = () => {
           value={formData.category}
           onChange={handleChange}
           required
-          className="border px-3 py-2 rounded"
+          className="border border-amber-400 px-4 py-2 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none transition"
         />
         <input
           name="price"
@@ -80,7 +83,7 @@ const AddFood = () => {
           value={formData.price}
           onChange={handleChange}
           required
-          className="border px-3 py-2 rounded"
+          className="border border-amber-400 px-4 py-2 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none transition"
         />
         <input
           name="discountPrice"
@@ -88,31 +91,32 @@ const AddFood = () => {
           placeholder="Discount Price"
           value={formData.discountPrice}
           onChange={handleChange}
-          className="border px-3 py-2 rounded"
+          className="border border-amber-400 px-4 py-2 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none transition"
         />
         <input
           name="image"
           placeholder="Image URL"
           value={formData.image}
           onChange={handleChange}
-          className="border px-3 py-2 rounded"
+          className="border border-amber-400 px-4 py-2 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none transition"
         />
         <select
           name="spiceLevel"
           value={formData.spiceLevel}
           onChange={handleChange}
-          className="border px-3 py-2 rounded"
+          className="border border-amber-400 px-4 py-2 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none transition"
         >
-          <option value="mild">Mild</option>
-          <option value="medium">Medium</option>
-          <option value="hot">Hot</option>
+          <option value="mild">Mild 🌿</option>
+          <option value="medium">Medium 🌶️</option>
+          <option value="hot">Hot 🔥</option>
         </select>
-        <label className="flex items-center gap-2">
+        <label className="flex items-center gap-2 text-amber-700 font-medium">
           <input
             name="isVeg"
             type="checkbox"
             checked={formData.isVeg}
             onChange={handleChange}
+            className="accent-amber-600"
           />
           Vegetarian
         </label>
@@ -122,17 +126,17 @@ const AddFood = () => {
           placeholder="Stock"
           value={formData.stock}
           onChange={handleChange}
-          className="border px-3 py-2 rounded"
+          className="border border-amber-400 px-4 py-2 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none transition"
         />
 
         <button
           type="submit"
           disabled={loading}
-          className="bg-amber-500 text-white py-2 rounded mt-2"
+          className="bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-lg font-semibold transition"
         >
           {loading ? "Creating..." : "Create Food"}
         </button>
-        {error && <p className="text-red-500 mt-2">{error}</p>}
+        {error && <p className="text-red-600 mt-2 text-center">{error}</p>}
       </form>
     </div>
   );
