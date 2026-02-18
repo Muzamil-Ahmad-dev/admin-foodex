@@ -1,4 +1,4 @@
- import axios from "axios";
+  import axios from "axios";
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
@@ -8,31 +8,10 @@ const menuAxios = axios.create({
   baseURL: API_URL,
 });
 
-// Attach token from localStorage
-menuAxios.interceptors.request.use((config) => {
-  const token = localStorage.getItem("accessToken");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-// Optional: handle 401
-menuAxios.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      // Token expired, you can log out or redirect to login
-      localStorage.removeItem("accessToken");
-    }
-    return Promise.reject(error);
-  }
-);
-
 /* ======================
-   MENU APIs
+   MENU APIs (PUBLIC)
 ====================== */
+
 export const getMenusApi = (queryParams = {}) =>
   menuAxios.get("/menu", { params: queryParams });
 
