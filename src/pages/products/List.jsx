@@ -10,6 +10,7 @@ const FoodList = () => {
   const [editData, setEditData] = useState({});
   const [preview, setPreview] = useState(null);
 
+  // Fetch menus and categories
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -26,26 +27,29 @@ const FoodList = () => {
     fetchData();
   }, []);
 
+  // Delete menu
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this menu item?")) return;
     try {
       await deleteMenuApi(id);
-      setMenus((prev) => prev.filter((m) => m._id !== id));
+      setMenus(prev => prev.filter(m => m._id !== id));
     } catch (err) {
       alert(err.response?.data?.message || "Failed to delete menu");
     }
   };
 
+  // Toggle availability
   const handleToggleAvailability = async (menu) => {
     try {
       const updatedMenu = { ...menu, isAvailable: !menu.isAvailable };
       await updateMenuApi(menu._id, updatedMenu);
-      setMenus((prev) => prev.map((m) => (m._id === menu._id ? updatedMenu : m)));
+      setMenus(prev => prev.map(m => (m._id === menu._id ? updatedMenu : m)));
     } catch (err) {
       alert(err.response?.data?.message || "Failed to update menu");
     }
   };
 
+  // Start editing
   const handleEditClick = (menu) => {
     setEditMenuId(menu._id);
     setEditData({
@@ -57,9 +61,9 @@ const FoodList = () => {
       stock: menu.stock,
       spiceLevel: menu.spiceLevel,
       isVeg: menu.isVeg,
-      imageFile: null,
+      imageFile: null, // file upload
     });
-    setPreview(menu.image);
+    setPreview(menu.image || null);
   };
 
   const handleCancelEdit = () => {
@@ -81,14 +85,20 @@ const FoodList = () => {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
-      const payload = new FormData();
+      const formData = new FormData();
       Object.keys(editData).forEach((key) => {
-        if (["price", "discountPrice", "stock"].includes(key)) payload.append(key, Number(editData[key]));
-        else if (key === "imageFile" && editData[key]) payload.append("imageFile", editData[key]);
-        else payload.append(key, editData[key]);
+        if (["price", "discountPrice", "stock"].includes(key)) {
+          formData.append(key, Number(editData[key]));
+        } else if (["isVeg", "isAvailable"].includes(key)) {
+          formData.append(key, editData[key] ? true : false);
+        } else if (key === "imageFile" && editData[key]) {
+          formData.append("imageFile", editData[key]);
+        } else {
+          formData.append(key, editData[key]);
+        }
       });
 
-      await updateMenuApi(editMenuId, payload);
+      await updateMenuApi(editMenuId, formData);
       handleCancelEdit();
 
       const menusRes = await getMenusApi();
@@ -106,10 +116,12 @@ const FoodList = () => {
       {menus.map((menu) => (
         <div key={menu._id} className="bg-white rounded-xl shadow-lg border border-amber-200 overflow-hidden flex flex-col">
           <div className="relative">
-            <img src={menu.image || "/placeholder.png"} alt={menu.name} className="w-full h-48 object-cover" />
-            <span className={`absolute top-2 left-2 text-xs px-2 py-1 rounded ${menu.isVeg ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}>
-              {menu.isVeg ? "Veg" : "Non-Veg"}
-            </span>
+            <img src={preview && editMenuId === menu._id ? preview : menu.image || "/placeholder.png"} alt={menu.name} className="w-full h-48 object-cover" />
+            {menu.isVeg ? (
+              <span className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">Veg</span>
+            ) : (
+              <span className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded">Non-Veg</span>
+            )}
             <span className="absolute top-2 right-2 bg-amber-600 text-white text-xs px-2 py-1 rounded">
               {menu.spiceLevel === "mild" && "🌿 Mild"}
               {menu.spiceLevel === "medium" && "🌶 Medium"}
@@ -148,9 +160,9 @@ const FoodList = () => {
               <>
                 <h3 className="font-semibold text-lg text-amber-700">{menu.name}</h3>
                 <p className="text-sm text-gray-600 line-clamp-2">{menu.description}</p>
-                <p className="font-bold text-amber-800">₹{menu.price.toFixed(2)}</p>
+                <p className="font-bold text-amber-800">₹{menu.price}</p>
                 <div className="flex gap-2 mt-3">
-                  <button onClick={() => handleToggleAvailability(menu)} className={`flex-1 py-2 text-white rounded-lg text-sm font-medium transition ${menu.isAvailable ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-400 cursor-not-allowed"}`}>
+                  <button onClick={() => handleToggleAvailability(menu)} className={`flex-1 py-2 text-white rounded-lg text-sm font-medium transition ${menu.isAvailable ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-400 cursor-pointer"}`}>
                     {menu.isAvailable ? "Mark Unavailable" : "Unavailable"}
                   </button>
                   <button onClick={() => handleEditClick(menu)} className="flex-1 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg text-sm font-medium transition">Edit</button>
