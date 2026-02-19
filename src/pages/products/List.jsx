@@ -8,8 +8,8 @@ const FoodList = () => {
   const [error, setError] = useState(null);
   const [editMenuId, setEditMenuId] = useState(null);
   const [editData, setEditData] = useState({});
+  const [preview, setPreview] = useState(null);
 
-  // Fetch menus and categories
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -26,7 +26,6 @@ const FoodList = () => {
     fetchData();
   }, []);
 
-  // Delete menu
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this menu item?")) return;
     try {
@@ -37,7 +36,6 @@ const FoodList = () => {
     }
   };
 
-  // Toggle availability
   const handleToggleAvailability = async (menu) => {
     try {
       const updatedMenu = { ...menu, isAvailable: !menu.isAvailable };
@@ -48,7 +46,6 @@ const FoodList = () => {
     }
   };
 
-  // Start editing
   const handleEditClick = (menu) => {
     setEditMenuId(menu._id);
     setEditData({
@@ -60,18 +57,22 @@ const FoodList = () => {
       stock: menu.stock,
       spiceLevel: menu.spiceLevel,
       isVeg: menu.isVeg,
+      imageFile: null,
     });
+    setPreview(menu.image);
   };
 
   const handleCancelEdit = () => {
     setEditMenuId(null);
     setEditData({});
+    setPreview(null);
   };
 
   const handleEditChange = (e) => {
     const { name, value, type, checked, files } = e.target;
     if (type === "file") {
       setEditData({ ...editData, imageFile: files[0] });
+      setPreview(files[0] ? URL.createObjectURL(files[0]) : null);
     } else {
       setEditData({ ...editData, [name]: type === "checkbox" ? checked : value });
     }
@@ -81,16 +82,15 @@ const FoodList = () => {
     e.preventDefault();
     try {
       const payload = new FormData();
-      for (const key in editData) {
+      Object.keys(editData).forEach((key) => {
         if (["price", "discountPrice", "stock"].includes(key)) payload.append(key, Number(editData[key]));
         else if (key === "imageFile" && editData[key]) payload.append("imageFile", editData[key]);
         else payload.append(key, editData[key]);
-      }
+      });
 
       await updateMenuApi(editMenuId, payload);
       handleCancelEdit();
 
-      // Refresh menus
       const menusRes = await getMenusApi();
       setMenus(menusRes.data.data);
     } catch (err) {
@@ -107,8 +107,9 @@ const FoodList = () => {
         <div key={menu._id} className="bg-white rounded-xl shadow-lg border border-amber-200 overflow-hidden flex flex-col">
           <div className="relative">
             <img src={menu.image || "/placeholder.png"} alt={menu.name} className="w-full h-48 object-cover" />
-            {menu.isVeg ? <span className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">Veg</span>
-                        : <span className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded">Non-Veg</span>}
+            <span className={`absolute top-2 left-2 text-xs px-2 py-1 rounded ${menu.isVeg ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}>
+              {menu.isVeg ? "Veg" : "Non-Veg"}
+            </span>
             <span className="absolute top-2 right-2 bg-amber-600 text-white text-xs px-2 py-1 rounded">
               {menu.spiceLevel === "mild" && "🌿 Mild"}
               {menu.spiceLevel === "medium" && "🌶 Medium"}
@@ -137,6 +138,7 @@ const FoodList = () => {
                   Vegetarian
                 </label>
                 <input type="file" name="imageFile" onChange={handleEditChange} />
+                {preview && <img src={preview} alt="Preview" className="mt-2 w-32 h-32 object-cover rounded-lg" />}
                 <div className="flex gap-2 mt-2">
                   <button type="submit" className="flex-1 bg-blue-500 text-white py-1 rounded">Save</button>
                   <button type="button" onClick={handleCancelEdit} className="flex-1 bg-gray-400 text-white py-1 rounded">Cancel</button>
@@ -146,10 +148,9 @@ const FoodList = () => {
               <>
                 <h3 className="font-semibold text-lg text-amber-700">{menu.name}</h3>
                 <p className="text-sm text-gray-600 line-clamp-2">{menu.description}</p>
-                <p className="font-bold text-amber-800">₹{menu.price}</p>
-
+                <p className="font-bold text-amber-800">₹{menu.price.toFixed(2)}</p>
                 <div className="flex gap-2 mt-3">
-                  <button onClick={() => handleToggleAvailability(menu)} className={`flex-1 py-2 text-white rounded-lg text-sm font-medium transition ${menu.isAvailable ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-400 cursor-pointer"}`}>
+                  <button onClick={() => handleToggleAvailability(menu)} className={`flex-1 py-2 text-white rounded-lg text-sm font-medium transition ${menu.isAvailable ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-400 cursor-not-allowed"}`}>
                     {menu.isAvailable ? "Mark Unavailable" : "Unavailable"}
                   </button>
                   <button onClick={() => handleEditClick(menu)} className="flex-1 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg text-sm font-medium transition">Edit</button>
