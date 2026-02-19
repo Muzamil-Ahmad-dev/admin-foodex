@@ -36,7 +36,7 @@ export const createMenuApi = (menuData) => {
     }
   });
 
-  return menuAxios.post("/menus", formData);
+  return menuAxios.post("/menu", formData);
 };
 
 // Update menu
@@ -49,19 +49,19 @@ export const updateMenuApi = (id, menuData) => {
     }
   });
 
-  return menuAxios.put(`/menus/${id}`, formData);
+  return menuAxios.put(`/menu/${id}`, formData);
 };
 
 // Fetch menus
 export const getMenusApi = (queryParams = {}) =>
-  menuAxios.get("/menus", { params: queryParams });
+  menuAxios.get("/menu", { params: queryParams });
 
 // Fetch menu details
 export const getMenuDetailsApi = (slug) =>
-  menuAxios.get(`/menus/slug/${slug}`);
+  menuAxios.get(`/menu/slug/${slug}`);
 
 // Delete menu
 export const deleteMenuApi = (id) =>
-  menuAxios.delete(`/menus/${id}`);
+  menuAxios.delete(`/menu/${id}`);
 
 export default menuAxios;
