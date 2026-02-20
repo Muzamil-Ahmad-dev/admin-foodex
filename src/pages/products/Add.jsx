@@ -37,7 +37,6 @@ const AddFood = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
-
     if (type === "file") {
       setFormData({ ...formData, imageFile: files[0] });
       setPreview(files[0] ? URL.createObjectURL(files[0]) : null);
@@ -63,6 +62,12 @@ const AddFood = () => {
       return;
     }
 
+    if (!formData.category) {
+      setError("Please select a category");
+      setLoading(false);
+      return;
+    }
+
     try {
       await createMenuApi(formData);
       navigate("/products");
@@ -81,7 +86,6 @@ const AddFood = () => {
         </legend>
 
         <form className="flex flex-col gap-4 mt-4" onSubmit={handleSubmit}>
-          
           <input
             name="name"
             placeholder="Food Name"
@@ -189,9 +193,7 @@ const AddFood = () => {
           </button>
 
           {error && (
-            <p className="text-red-300 text-center font-medium mt-2">
-              {error}
-            </p>
+            <p className="text-red-300 text-center font-medium mt-2">{error}</p>
           )}
         </form>
       </fieldset>

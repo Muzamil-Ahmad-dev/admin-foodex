@@ -26,42 +26,35 @@ export const deleteCategoryApi = (id) =>
    MENU APIs
 ====================== */
 
-// Create menu
-export const createMenuApi = (menuData) => {
+// Helper to convert menu data to FormData
+const toFormData = (menuData) => {
   const formData = new FormData();
-
   Object.keys(menuData).forEach((key) => {
-    if (menuData[key] !== undefined && menuData[key] !== null) {
-      formData.append(key, menuData[key]);
+    const value = menuData[key];
+    if (value !== undefined && value !== null && value !== "") {
+      formData.append(key, value);
     }
   });
-
-  return menuAxios.post("/menu", formData);
+  return formData;
 };
+
+// Create menu
+export const createMenuApi = (menuData) =>
+  menuAxios.post("/menus", toFormData(menuData));
 
 // Update menu
-export const updateMenuApi = (id, menuData) => {
-  const formData = new FormData();
-
-  Object.keys(menuData).forEach((key) => {
-    if (menuData[key] !== undefined && menuData[key] !== null) {
-      formData.append(key, menuData[key]);
-    }
-  });
-
-  return menuAxios.put(`/menu/${id}`, formData);
-};
+export const updateMenuApi = (id, menuData) =>
+  menuAxios.put(`/menus/${id}`, toFormData(menuData));
 
 // Fetch menus
 export const getMenusApi = (queryParams = {}) =>
-  menuAxios.get("/menu", { params: queryParams });
+  menuAxios.get("/menus", { params: queryParams });
 
-// Fetch menu details
+// Fetch menu details by slug
 export const getMenuDetailsApi = (slug) =>
-  menuAxios.get(`/menu/slug/${slug}`);
+  menuAxios.get(`/menus/slug/${slug}`);
 
 // Delete menu
-export const deleteMenuApi = (id) =>
-  menuAxios.delete(`/menu/${id}`);
+export const deleteMenuApi = (id) => menuAxios.delete(`/menus/${id}`);
 
 export default menuAxios;

@@ -16,6 +16,7 @@ const FoodList = () => {
   const [editData, setEditData] = useState({});
   const [preview, setPreview] = useState(null);
 
+  // Fetch menus and categories
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -34,6 +35,7 @@ const FoodList = () => {
     fetchData();
   }, []);
 
+  // Delete menu item
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this menu item?")) return;
     try {
@@ -44,6 +46,7 @@ const FoodList = () => {
     }
   };
 
+  // Toggle availability
   const handleToggleAvailability = async (menu) => {
     try {
       await updateMenuApi(menu._id, { isAvailable: !menu.isAvailable });
@@ -59,6 +62,7 @@ const FoodList = () => {
     }
   };
 
+  // Start editing
   const handleEditClick = (menu) => {
     setEditMenuId(menu._id);
     setEditData({
@@ -75,6 +79,7 @@ const FoodList = () => {
     setPreview(menu.image);
   };
 
+  // Handle edit form changes
   const handleEditChange = (e) => {
     const { name, value, type, checked, files } = e.target;
     if (type === "file") {
@@ -88,20 +93,37 @@ const FoodList = () => {
     }
   };
 
+  // Submit edit form
   const handleEditSubmit = async (e) => {
     e.preventDefault();
+
+    if (
+      editData.discountPrice &&
+      Number(editData.discountPrice) >= Number(editData.price)
+    ) {
+      alert("Discount price must be less than price");
+      return;
+    }
+
+    if (!editData.category) {
+      alert("Please select a category");
+      return;
+    }
+
     try {
       await updateMenuApi(editMenuId, editData);
       setEditMenuId(null);
       const res = await getMenusApi();
       setMenus(res.data.data);
-    } catch {
-      alert("Update failed");
+    } catch (err) {
+      alert(err.response?.data?.message || "Update failed");
     }
   };
 
-  if (loading) return <p className="text-center text-yellow-400">Loading...</p>;
-  if (error) return <p className="text-center text-red-400">{error}</p>;
+  if (loading)
+    return <p className="text-center text-yellow-400">Loading...</p>;
+  if (error)
+    return <p className="text-center text-red-400">{error}</p>;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -118,7 +140,10 @@ const FoodList = () => {
 
           <div className="p-4 flex-1 text-yellow-100">
             {editMenuId === menu._id ? (
-              <form onSubmit={handleEditSubmit} className="flex flex-col gap-2">
+              <form
+                onSubmit={handleEditSubmit}
+                className="flex flex-col gap-2"
+              >
                 <input
                   name="name"
                   value={editData.name}
@@ -151,6 +176,44 @@ const FoodList = () => {
                   onChange={handleEditChange}
                   className="rounded px-2 py-1"
                 />
+
+                <input
+                  type="number"
+                  name="discountPrice"
+                  value={editData.discountPrice}
+                  onChange={handleEditChange}
+                  className="rounded px-2 py-1"
+                />
+
+                <input
+                  type="number"
+                  name="stock"
+                  value={editData.stock}
+                  onChange={handleEditChange}
+                  className="rounded px-2 py-1"
+                />
+
+                <select
+                  name="spiceLevel"
+                  value={editData.spiceLevel}
+                  onChange={handleEditChange}
+                  className="rounded px-2 py-1"
+                >
+                  <option value="mild">🌿 Mild</option>
+                  <option value="medium">🌶 Medium</option>
+                  <option value="hot">🔥 Hot</option>
+                </select>
+
+                <label className="flex items-center gap-2 text-yellow-300 font-medium">
+                  <input
+                    name="isVeg"
+                    type="checkbox"
+                    checked={editData.isVeg}
+                    onChange={handleEditChange}
+                    className="accent-yellow-400"
+                  />
+                  Vegetarian
+                </label>
 
                 <input
                   type="file"
