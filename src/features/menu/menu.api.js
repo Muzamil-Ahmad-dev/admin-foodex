@@ -3,6 +3,7 @@
 const API_URL =
   import.meta.env.VITE_API_URL ||
   "https://foodex-backend--muzamilsakhi079.replit.app/api";
+  // "http://localhost:5000/api";
 
 const menuAxios = axios.create({
   baseURL: API_URL,

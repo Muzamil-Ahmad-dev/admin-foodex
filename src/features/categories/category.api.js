@@ -1,6 +1,7 @@
  import axios from "axios";
 
 const API_URL = "/api/categories"; // relative path works for Vercel
+// const API_URL = "http://localhost:5000/api/categories"; 
 
 // --------------------
 // Public CRUD functions  
