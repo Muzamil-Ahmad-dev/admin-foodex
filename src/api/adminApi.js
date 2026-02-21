@@ -2,8 +2,8 @@
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
-  // "https://foodex-backend--muzamilsakhi079.replit.app/api";
-  "http://localhost:5000/api";
+  "https://foodex-backend--muzamilsakhi079.replit.app/api";
+  // "http://localhost:5000/api";
 
 // Admin Axios instance
 const adminAxios = axios.create({
