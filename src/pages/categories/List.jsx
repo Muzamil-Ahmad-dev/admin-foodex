@@ -45,35 +45,42 @@ const CategoriesList = () => {
     }
   };
 
-  if (loading) return <p className="text-gray-500 text-center">Loading categories...</p>;
-  if (error) return <p className="text-red-500 text-center">{error}</p>;
+  if (loading)
+    return <p className="text-gray-400 text-center py-6">Loading categories...</p>;
+  if (error)
+    return <p className="text-red-500 text-center py-6">{error}</p>;
 
   return (
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
       {categories.map((cat) => (
         <motion.div
           key={cat._id}
-          className="bg-white p-5 rounded-xl shadow-lg flex flex-col justify-between hover:shadow-2xl transition duration-200"
+          className="bg-[#1E1B2A] rounded-xl shadow-lg p-5 flex flex-col justify-between border border-[#3B2A1E] hover:border-amber-500 transition-all duration-300"
           whileHover={{ scale: 1.03 }}
         >
           <div>
-            <h3 className="text-xl font-bold text-amber-700 mb-2">{cat.name}</h3>
-            <p className="text-gray-500 text-sm">ID: {cat._id}</p>
-            <p className="text-gray-400 text-sm">Slug: {cat.slug}</p>
-            <p className={`text-sm font-medium ${cat.isActive ? "text-green-600" : "text-red-500"}`}>
+            <h3 className="text-xl font-bold text-amber-400 mb-1">{cat.name}</h3>
+            <p className="text-gray-400 text-sm">ID: {cat._id}</p>
+            <p className="text-gray-500 text-sm mt-1">Slug: {cat.slug}</p>
+            <span
+              className={`inline-block mt-2 px-2 py-1 rounded-full text-xs font-medium ${
+                cat.isActive ? "bg-green-600 text-white" : "bg-red-500 text-white"
+              }`}
+            >
               {cat.isActive ? "Active" : "Inactive"}
-            </p>
+            </span>
           </div>
-          <div className="mt-4 flex gap-2">
+
+          <div className="mt-4 flex gap-3">
             <button
               onClick={() => handleUpdate(cat._id, cat.name)}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded transition duration-200"
+              className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition"
             >
               Edit
             </button>
             <button
               onClick={() => handleDelete(cat._id)}
-              className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition duration-200"
+              className="flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg transition"
             >
               Delete
             </button>

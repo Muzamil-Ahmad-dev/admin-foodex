@@ -17,7 +17,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { adminLogout } from "../../features/auth/authSlice"; // updated import
+import { adminLogout } from "../../features/auth/authSlice";
 
 const Sidebar = ({ isOpen, setIsOpen, mobileOpen, setMobileOpen }) => {
   const dispatch = useDispatch();
@@ -26,9 +26,9 @@ const Sidebar = ({ isOpen, setIsOpen, mobileOpen, setMobileOpen }) => {
 
   const handleLogout = async () => {
     await dispatch(adminLogout());
+    if (mobileOpen) setMobileOpen(false);
   };
 
-  // Only show admin menus if logged in
   const menu = [
     { name: "Dashboard", icon: FaHome, path: "/dashboard" },
     ...(admin?.role === "admin"
@@ -73,11 +73,10 @@ const Sidebar = ({ isOpen, setIsOpen, mobileOpen, setMobileOpen }) => {
           {isOpen && <span className="text-lg font-medium">{item.name}</span>}
         </div>
       ) : (
-        <NavLink to={item.path} end>
+        <NavLink to={item.path} end onClick={() => mobileOpen && setMobileOpen(false)}>
           {({ isActive }) => (
             <motion.div
               whileHover={{ x: isOpen ? 6 : 0 }}
-              onClick={() => mobileOpen && setMobileOpen(false)}
               className={`relative w-full flex items-center rounded-xl px-4 py-3
                 ${isOpen ? "gap-4 justify-start" : "justify-center"}
                 ${
@@ -94,7 +93,6 @@ const Sidebar = ({ isOpen, setIsOpen, mobileOpen, setMobileOpen }) => {
       );
     }
 
-    // Nested menu
     return (
       <div>
         <motion.div
@@ -125,7 +123,12 @@ const Sidebar = ({ isOpen, setIsOpen, mobileOpen, setMobileOpen }) => {
               {item.children.map((child) => {
                 const ChildIcon = child.icon;
                 return (
-                  <NavLink key={child.name} to={child.path} end>
+                  <NavLink
+                    key={child.name}
+                    to={child.path}
+                    end
+                    onClick={() => mobileOpen && setMobileOpen(false)}
+                  >
                     {({ isActive }) => (
                       <div
                         className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm
@@ -149,6 +152,10 @@ const Sidebar = ({ isOpen, setIsOpen, mobileOpen, setMobileOpen }) => {
     );
   };
 
+  // Scrollable classes
+  const scrollClass =
+    "flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-amber-600 scrollbar-track-transparent hover:scrollbar-thumb-amber-400";
+
   return (
     <>
       {/* DESKTOP */}
@@ -156,9 +163,11 @@ const Sidebar = ({ isOpen, setIsOpen, mobileOpen, setMobileOpen }) => {
         className={`hidden lg:flex h-screen border-r transition-all duration-300
           ${isOpen ? "w-72 px-6 bg-[#2D1B0E]/95 border-amber-900/40" : "w-20 px-3 bg-[#3B2A1E]/95 border-amber-900/20"}`}
       >
-        <div className="flex flex-col w-full py-8 justify-between">
-          <div>
-            <div className="flex items-center justify-between">
+        <div className="flex flex-col w-full h-full py-4 justify-between">
+          {/* Scrollable area */}
+          <div className={scrollClass}>
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
               {isOpen && (
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
                   Foodify
@@ -169,14 +178,16 @@ const Sidebar = ({ isOpen, setIsOpen, mobileOpen, setMobileOpen }) => {
               </button>
             </div>
 
-            <nav className="mt-10 space-y-2">
+            {/* Menu */}
+            <nav className="space-y-2">
               {menu.map((item) => (
                 <MenuItem key={item.name} item={item} />
               ))}
             </nav>
           </div>
 
-          <div className={`text-xs text-gray-400 ${!isOpen && "hidden"}`}>© 2025 Foodify</div>
+          {/* Footer */}
+          <div className={`text-xs text-gray-400 mt-4 ${!isOpen && "hidden"}`}>© 2025 Foodify</div>
         </div>
       </aside>
 
@@ -196,15 +207,32 @@ const Sidebar = ({ isOpen, setIsOpen, mobileOpen, setMobileOpen }) => {
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
-              className="fixed inset-y-0 left-0 z-50 w-72 bg-[#2D1B0E]/95 border-r border-amber-900/40 px-6 py-6 flex flex-col justify-between lg:hidden"
+              className="fixed inset-y-0 left-0 z-50 w-72 bg-[#2D1B0E]/95 border-r border-amber-900/40 px-6 py-6 flex flex-col lg:hidden"
             >
-              <nav className="space-y-2">
-                {menu.map((item) => (
-                  <MenuItem key={item.name} item={item} />
-                ))}
-              </nav>
+              {/* Scrollable menu for mobile */}
+              <div className={`${scrollClass} space-y-2`}>
+                {/* Header */}
+                <div className="flex items-center justify-between mb-4">
+                  {isOpen && (
+                    <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
+                      Foodify
+                    </h1>
+                  )}
+                  <button onClick={() => setMobileOpen(false)} className="text-amber-400 hover:text-orange-500">
+                    <FaBars size={20} />
+                  </button>
+                </div>
 
-              <div className="text-xs text-gray-400">© 2025 Foodify</div>
+                {/* Menu */}
+                <nav className="space-y-2">
+                  {menu.map((item) => (
+                    <MenuItem key={item.name} item={item} />
+                  ))}
+                </nav>
+              </div>
+
+              {/* Footer */}
+              <div className="text-xs text-gray-400 mt-4">© 2025 Foodify</div>
             </motion.aside>
           </>
         )}

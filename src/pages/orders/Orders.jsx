@@ -22,45 +22,57 @@ export default function OrdersPage() {
 
   return (
     <div className="p-4 sm:p-6">
-      <h1 className="text-2xl font-bold mb-4">Orders Dashboard</h1>
+      {/* 🔥 GRADIENT TITLE */}
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6 bg-gradient-to-r from-amber-400 via-orange-500 to-amber-600 bg-clip-text text-transparent">
+        Orders Dashboard
+      </h1>
 
-      {/* 🔍 SEARCH */}
-      <input
-        type="text"
-        placeholder="Search by phone or order key..."
-        value={search}
-        onChange={(e) => {
-          setSearch(e.target.value);
-          setPage(1);
-        }}
-        className="mb-4 p-2 border rounded w-full sm:w-80"
-      />
+      {/* 🔍 SEARCH (by order key only) */}
+      <div className="mb-6">
+        <input
+          type="text"
+          placeholder="Search by order key..."
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
+          className="w-full sm:w-80 p-3 rounded-lg bg-[#3B2A1E]/80 text-white placeholder-gray-300 border border-amber-500/30 focus:outline-none focus:ring-2 focus:ring-amber-500"
+        />
+      </div>
 
-      <OrdersSummary orders={orders} />
+      {/* 📊 SUMMARY CARD */}
+      <div className="bg-[#3B2A1E]/80 rounded-xl shadow-md p-4 mb-6">
+        <OrdersSummary orders={orders} />
+      </div>
 
-      {loading && <p>Loading...</p>}
+      {/* ⚠️ STATES */}
+      {loading && <p className="text-amber-400">Loading...</p>}
       {error && <p className="text-red-500">{error}</p>}
 
-      <OrdersTable data={orders} />
+      {/* 📋 TABLE CARD */}
+      <div className="bg-[#3B2A1E]/80 rounded-xl shadow-md p-4">
+        <OrdersTable data={orders} />
+      </div>
 
       {/* 📄 PAGINATION */}
-      <div className="flex justify-center items-center gap-4 mt-6">
+      <div className="flex justify-center items-center gap-4 mt-8">
         <button
           disabled={page === 1}
           onClick={() => setPage((p) => p - 1)}
-          className="px-4 py-2 border rounded disabled:opacity-50"
+          className="px-4 py-2 rounded-lg bg-amber-600 text-black font-semibold disabled:opacity-40 hover:bg-amber-500 transition"
         >
           Prev
         </button>
 
-        <span className="font-medium">
+        <span className="font-medium text-amber-300">
           Page {page} of {totalPages || 1}
         </span>
 
         <button
           disabled={page === totalPages}
           onClick={() => setPage((p) => p + 1)}
-          className="px-4 py-2 border rounded disabled:opacity-50"
+          className="px-4 py-2 rounded-lg bg-amber-600 text-black font-semibold disabled:opacity-40 hover:bg-amber-500 transition"
         >
           Next
         </button>

@@ -6,7 +6,6 @@ import * as XLSX from "xlsx";
 export default function OrdersTable({ data = [] }) {
   const dispatch = useDispatch();
 
-  /* ================= STATUS UPDATE ================= */
   const handleStatusChange = (id, newStatus) => {
     dispatch(updateOrder({ id, status: newStatus }));
   };
@@ -21,7 +20,6 @@ export default function OrdersTable({ data = [] }) {
     }
   };
 
-  /* ================= EXCEL DOWNLOAD ================= */
   const handleDownloadExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(
       data.map((order) => ({
@@ -29,7 +27,7 @@ export default function OrdersTable({ data = [] }) {
         Items: order.items
           .map((i) => `${i.menuItem?.name || "N/A"} x ${i.quantity}`)
           .join(", "),
-        Total: order.totalAmount,
+        Total: `₨${order.totalAmount.toLocaleString("en-PK")}`,
         PaymentMethod: order.paymentMethod,
         PaymentStatus: order.paymentStatus || "Pending",
         OrderStatus: order.status || "Pending",
@@ -50,127 +48,133 @@ export default function OrdersTable({ data = [] }) {
       {/* Download Button */}
       <button
         onClick={handleDownloadExcel}
-        className="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+        className="mb-4 px-4 py-2 bg-amber-500 text-black rounded-lg hover:bg-amber-400 transition"
       >
         Download Excel
       </button>
 
-      <table className="w-full table-auto border text-sm">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="border px-3 py-2">Order ID</th>
-            <th className="border px-3 py-2">Items</th>
-            <th className="border px-3 py-2">Total</th>
-            <th className="border px-3 py-2">Payment Method</th>
-            <th className="border px-3 py-2">Payment Status</th>
-            <th className="border px-3 py-2">Order Status</th>
-            <th className="border px-3 py-2">Stripe ID</th>
-            <th className="border px-3 py-2">Address</th>
-            <th className="border px-3 py-2">Contact</th>
-            <th className="border px-3 py-2">Date</th>
-            <th className="border px-3 py-2">Actions</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {data.length === 0 && (
+      <div className="overflow-x-auto">
+        <table className="w-full table-auto border-collapse text-sm">
+          <thead className="bg-[#3B2A1E]/80 text-gray-300">
             <tr>
-              <td colSpan="11" className="text-center py-6 text-gray-500">
-                No orders found
-              </td>
+              <th className="border px-3 py-2">Order ID</th>
+              <th className="border px-3 py-2">Items</th>
+              <th className="border px-3 py-2">Total</th>
+              <th className="border px-3 py-2">Payment Method</th>
+              <th className="border px-3 py-2">Payment Status</th>
+              <th className="border px-3 py-2">Order Status</th>
+              <th className="border px-3 py-2">Stripe ID</th>
+              <th className="border px-3 py-2">Address</th>
+              <th className="border px-3 py-2">Contact</th>
+              <th className="border px-3 py-2">Date</th>
+              <th className="border px-3 py-2">Actions</th>
             </tr>
-          )}
+          </thead>
 
-          {data.map((row) => (
-            <tr key={row._id} className="border hover:bg-gray-50">
-              <td className="border px-3 py-2 font-semibold">
-                #{row._id.slice(-6).toUpperCase()}
-              </td>
+          <tbody>
+            {data.length === 0 && (
+              <tr>
+                <td colSpan="11" className="text-center py-6 text-gray-400">
+                  No orders found
+                </td>
+              </tr>
+            )}
 
-              <td className="border px-3 py-2">
-                {row.items
-                  .map(
-                    (i) => `${i.menuItem?.name || "N/A"} x ${i.quantity}`
-                  )
-                  .join(", ")}
-              </td>
+            {data.map((row) => (
+              <tr
+                key={row._id}
+                className="border-b hover:bg-[#3B2A1E]/50 transition-colors"
+              >
+                <td className="border px-3 py-2 font-semibold text-amber-400">
+                  #{row._id.slice(-6).toUpperCase()}
+                </td>
 
-              <td className="border px-3 py-2 font-medium">
-                ₹{row.totalAmount}
-              </td>
+                <td className="border px-3 py-2">
+                  {row.items
+                    .map(
+                      (i) => `${i.menuItem?.name || "N/A"} x ${i.quantity}`
+                    )
+                    .join(", ")}
+                </td>
 
-              {/* Payment Method */}
-              <td className="border px-3 py-2">
-                <span
-                  className={`px-2 py-1 rounded text-white text-xs ${
-                    row.paymentMethod === "CARD"
-                      ? "bg-green-600"
-                      : "bg-orange-500"
-                  }`}
-                >
-                  {row.paymentMethod}
-                </span>
-              </td>
+                <td className="border px-3 py-2 font-medium text-green-400">
+                  ₨{row.totalAmount.toLocaleString("en-PK")}
+                </td>
 
-              {/* Payment Status */}
-              <td className="border px-3 py-2">
-                <select
-                  value={row.paymentStatus || "Pending"}
-                  onChange={(e) =>
-                    handlePaymentChange(row._id, e.target.value)
-                  }
-                  className="border rounded px-2 py-1 text-sm"
-                >
-                  <option value="Pending">Pending</option>
-                  <option value="Paid">Paid</option>
-                  <option value="Failed">Failed</option>
-                </select>
-              </td>
+                {/* Payment Method */}
+                <td className="border px-3 py-2">
+                  <span
+                    className={`px-2 py-1 rounded text-white text-xs ${
+                      row.paymentMethod === "CARD"
+                        ? "bg-green-600"
+                        : "bg-orange-500"
+                    }`}
+                  >
+                    {row.paymentMethod}
+                  </span>
+                </td>
 
-              {/* Order Status */}
-              <td className="border px-3 py-2">
-                <select
-                  value={row.status || "Pending"}
-                  onChange={(e) =>
-                    handleStatusChange(row._id, e.target.value)
-                  }
-                  className="border rounded px-2 py-1 text-sm"
-                >
-                  <option value="Pending">Pending</option>
-                  <option value="Preparing">Preparing</option>
-                  <option value="Out for Delivery">Out for Delivery</option>
-                  <option value="Delivered">Delivered</option>
-                  <option value="Cancelled">Cancelled</option>
-                </select>
-              </td>
+                {/* Payment Status */}
+                <td className="border px-3 py-2">
+                  <select
+                    value={row.paymentStatus || "Pending"}
+                    onChange={(e) =>
+                      handlePaymentChange(row._id, e.target.value)
+                    }
+                    className="border rounded px-2 py-1 text-sm bg-[#3B2A1E]/70 text-white"
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Paid">Paid</option>
+                    <option value="Failed">Failed</option>
+                  </select>
+                </td>
 
-              {/* Stripe ID */}
-              <td className="border px-3 py-2 text-xs">
-                {row.stripePaymentIntentId || "-"}
-              </td>
+                {/* Order Status */}
+                <td className="border px-3 py-2">
+                  <select
+                    value={row.status || "Pending"}
+                    onChange={(e) =>
+                      handleStatusChange(row._id, e.target.value)
+                    }
+                    className="border rounded px-2 py-1 text-sm bg-[#3B2A1E]/70 text-white"
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Preparing">Preparing</option>
+                    <option value="Out for Delivery">Out for Delivery</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </select>
+                </td>
 
-              <td className="border px-3 py-2 max-w-[200px] truncate">
-                {row.deliveryAddress}
-              </td>
+                <td className="border px-3 py-2 text-xs text-gray-300">
+                  {row.stripePaymentIntentId || "-"}
+                </td>
 
-              <td className="border px-3 py-2">{row.contactNumber}</td>
+                <td className="border px-3 py-2 max-w-[200px] truncate text-gray-200">
+                  {row.deliveryAddress}
+                </td>
 
-              <td className="border px-3 py-2 text-xs">
-                {new Date(row.createdAt).toLocaleString()}
-              </td>
+                <td className="border px-3 py-2 text-gray-200">
+                  {row.contactNumber}
+                </td>
 
-              <td className="border px-3 py-2">
-                <button
-                  onClick={() => handleDelete(row._id)}
-                  className="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-xs"
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                <td className="border px-3 py-2 text-xs text-gray-300">
+                  {new Date(row.createdAt).toLocaleString()}
+                </td>
+
+                <td className="border px-3 py-2">
+                  <button
+                    onClick={() => handleDelete(row._id)}
+                    className="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-xs"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
