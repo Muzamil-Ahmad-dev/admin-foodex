@@ -1,5 +1,5 @@
 import axios from "axios";
-import store from "../app/store"; // make sure the path matches your project
+import store from "../app/store";  
 
 const BASE_URL = "https://foodex-backend--muzamilsakhi079.replit.app/api";
 
