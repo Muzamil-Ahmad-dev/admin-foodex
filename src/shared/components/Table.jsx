@@ -1,6 +1,21 @@
  import React from "react";
 import { motion } from "framer-motion";
 
+/**
+ * A reusable table component with hover animation.
+ *
+ * @param {Object} props
+ * @param {string[]} props.columns - Array of column header titles
+ * @param {Array<Array<React.ReactNode>>} props.data - 2D array of table rows and cells
+ * @component
+ * @example
+ * const columns = ["Name", "Email", "Status"];
+ * const data = [
+ *   ["Alice", "alice@example.com", <StatusBadge status="active" />],
+ *   ["Bob", "bob@example.com", <StatusBadge status="inactive" />],
+ * ];
+ * return <Table columns={columns} data={data} />
+ */
 const Table = ({ columns, data }) => {
   return (
     <div className="overflow-x-auto bg-[#3B1F0F]/70 rounded-xl shadow-lg border border-amber-900/30">
@@ -38,4 +53,3 @@ const Table = ({ columns, data }) => {
 };
 
 export default Table;
-    

@@ -1,17 +1,49 @@
- import { useEffect, useState } from "react";
+ /**
+ * @file Dashboard.jsx
+ * @description
+ * Admin Dashboard component for the Foodify application.
+ * 
+ * Features:
+ * - Displays key stats cards for the admin
+ * - Shows recent orders in a table
+ * - Shows recent support/contact queries in a table
+ * 
+ * Dependencies:
+ * - Redux for admin state (useSelector)
+ * - Table and StatusBadge shared components
+ * - getAdminDashboard API for fetching dashboard data
+ * 
+ * @module Components/Dashboard
+ */
+
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Table from "../../shared/components/Table.jsx";
 import StatusBadge from "../../shared/components/StatusBadge.jsx";
 import { getAdminDashboard } from "./auth.api.js";
 
+/**
+ * Dashboard Component
+ * @component
+ * @returns {JSX.Element} Admin dashboard UI
+ */
 export default function Dashboard() {
+  /** @type {Object|null} admin - Currently logged-in admin info from Redux */
   const admin = useSelector((state) => state.auth.admin);
+
+  /** @type {string|null} token - Admin auth token from Redux */
   const token = useSelector((state) => state.auth.token);
 
+  /** @type {[Array<Object>, Function]} stats - Key dashboard statistics */
   const [stats, setStats] = useState([]);
+
+  /** @type {[Array<Object>, Function]} recentOrders - List of recent orders */
   const [recentOrders, setRecentOrders] = useState([]);
+
+  /** @type {[Array<Object>, Function]} recentContacts - List of recent support queries */
   const [recentContacts, setRecentContacts] = useState([]);
 
+  /** Fetch dashboard data when token is available */
   useEffect(() => {
     const fetchDashboard = async () => {
       if (!token) return;
@@ -27,6 +59,7 @@ export default function Dashboard() {
     fetchDashboard();
   }, [token]);
 
+  /** Table column definitions for recent orders */
   const orderColumns = [
     { key: "orderId", label: "Order ID" },
     { key: "customer", label: "Customer" },
@@ -34,6 +67,7 @@ export default function Dashboard() {
     { key: "status", label: "Status", render: (row) => <StatusBadge status={row.status} /> },
   ];
 
+  /** Table column definitions for recent contacts/support queries */
   const contactColumns = [
     { key: "name", label: "Name" },
     { key: "email", label: "Email" },

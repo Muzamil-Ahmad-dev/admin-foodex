@@ -1,4 +1,22 @@
- import React, { useEffect, useState } from "react";
+ /**
+ * @file CategoriesList.jsx
+ * @description
+ * Displays a list of categories with options to edit or delete each category.
+ * Features:
+ * - Fetches categories from the API on mount
+ * - Allows inline update of category names via prompt
+ * - Handles deletion of categories with confirmation
+ * - Shows loading and error states
+ * - Uses Framer Motion for hover animations
+ *
+ * @component
+ *
+ * @returns {JSX.Element} Grid UI of category cards with edit and delete actions
+ *
+ * @example
+ * <CategoriesList />
+ */
+import React, { useEffect, useState } from "react";
 import { fetchCategories, updateCategory, deleteCategory } from "../../features/categories/category.api";
 import { motion } from "framer-motion";
 

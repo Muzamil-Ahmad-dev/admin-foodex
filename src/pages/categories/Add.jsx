@@ -1,4 +1,25 @@
- import React, { useState } from "react";
+ /**
+ * @file CategoriesAdd.jsx
+ * @description
+ * A form component to add new categories to the system.
+ * Features:
+ * - Input for category name
+ * - Handles API request to create category
+ * - Displays success or error messages
+ * - Optional callback when a new category is added
+ * - Framer Motion animations for fade-in effect
+ *
+ * @component
+ *
+ * @param {Object} props
+ * @param {(category: Object) => void} [props.onAdded] - Callback invoked with the newly created category after successful creation
+ *
+ * @returns {JSX.Element} Form UI for adding a category
+ *
+ * @example
+ * <CategoriesAdd onAdded={(category) => console.log("Added category:", category)} />
+ */
+import React, { useState } from "react";
 import { createCategory } from "../../features/categories/category.api";
 import { motion } from "framer-motion";
 

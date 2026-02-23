@@ -7,6 +7,15 @@ import {
 } from "../../features/menu/menu.api";
 import { FaLeaf, FaPepperHot, FaFire } from "react-icons/fa";
 
+/**
+ * Component to display a list of food menu items with options to edit, delete,
+ * and toggle availability. Supports spice levels, vegetarian indicator, and
+ * image preview when editing.
+ *
+ * @component
+ * @example
+ * return <FoodList />
+ */
 const FoodList = () => {
   const [menus, setMenus] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -17,12 +26,14 @@ const FoodList = () => {
   const [editData, setEditData] = useState({});
   const [preview, setPreview] = useState(null);
 
+  /** Spice level options with icons */
   const spiceOptions = [
     { label: "Mild", value: "mild", icon: <FaLeaf className="text-green-400" /> },
     { label: "Medium", value: "medium", icon: <FaPepperHot className="text-orange-400" /> },
     { label: "Hot", value: "hot", icon: <FaFire className="text-red-500" /> },
   ];
 
+  /** Fetch menus and categories on component mount */
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -38,6 +49,10 @@ const FoodList = () => {
     fetchData();
   }, []);
 
+  /**
+   * Delete a menu item by id
+   * @param {string} id - The ID of the menu item to delete
+   */
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this menu item?")) return;
     try {
@@ -48,6 +63,10 @@ const FoodList = () => {
     }
   };
 
+  /**
+   * Toggle the availability of a menu item
+   * @param {object} menu - The menu item to toggle
+   */
   const handleToggleAvailability = async (menu) => {
     try {
       await updateMenuApi(menu._id, { isAvailable: !menu.isAvailable });
@@ -59,6 +78,10 @@ const FoodList = () => {
     }
   };
 
+  /**
+   * Initiate editing mode for a menu item
+   * @param {object} menu - The menu item to edit
+   */
   const handleEditClick = (menu) => {
     setEditMenuId(menu._id);
     setEditData({
@@ -75,6 +98,10 @@ const FoodList = () => {
     setPreview(menu.image);
   };
 
+  /**
+   * Handle changes in the edit form inputs
+   * @param {React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>} e
+   */
   const handleEditChange = (e) => {
     const { name, value, type, checked, files } = e.target;
     if (type === "file") {
@@ -88,6 +115,10 @@ const FoodList = () => {
     }
   };
 
+  /**
+   * Submit the edit form and update the menu item
+   * @param {React.FormEvent<HTMLFormElement>} e
+   */
   const handleEditSubmit = async (e) => {
     e.preventDefault();
 
@@ -180,7 +211,6 @@ const FoodList = () => {
                   placeholder="Stock"
                 />
 
-                {/* Spice Level with icon preview */}
                 <div className="flex items-center gap-2 mt-1">
                   {spiceOptions.map((opt) => (
                     <button

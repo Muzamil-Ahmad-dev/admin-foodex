@@ -8,7 +8,7 @@ const api = axios.create({
   withCredentials: true, // always send cookies (refresh token)
 });
 
-// 🔥 Axios interceptor automatically attaches accessToken
+//  Axios interceptor automatically attaches accessToken
 api.interceptors.request.use((config) => {
   const { user, accessToken } = store.getState().auth;
 

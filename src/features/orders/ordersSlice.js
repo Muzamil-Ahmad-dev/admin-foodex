@@ -1,11 +1,36 @@
- import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+ /**
+ * @file ordersSlice.js
+ * @description
+ * Redux slice for **admin order management** in Foodify.
+ * Handles fetching, updating, and deleting orders via async thunks.
+ * 
+ * Features:
+ * - fetchOrders: Fetch all orders for admin
+ * - updateOrder: Update order status and payment status
+ * - deleteOrder: Delete an order
+ * 
+ * @module Redux/orders
+ * @dependencies
+ * - Redux Toolkit: createSlice, createAsyncThunk
+ * - Axios for HTTP requests
+ */
+
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
+/** Base API URL */
 const API_URL =
   import.meta.env.VITE_API_URL ||
   "https://foodex-backend--muzamilsakhi079.replit.app/api";
 
 /* ================= FETCH ORDERS ================= */
+
+/**
+ * Async thunk to fetch all orders for admin
+ * @async
+ * @function fetchOrders
+ * @returns {Promise<Array<Object>>} List of orders
+ */
 export const fetchOrders = createAsyncThunk(
   "orders/fetchOrders",
   async (_, { rejectWithValue }) => {
@@ -21,6 +46,17 @@ export const fetchOrders = createAsyncThunk(
 );
 
 /* ================= UPDATE ORDER ================= */
+
+/**
+ * Async thunk to update an order
+ * @async
+ * @function updateOrder
+ * @param {Object} payload
+ * @param {string} payload.id - Order ID
+ * @param {string} payload.status - New order status
+ * @param {string} payload.paymentStatus - New payment status
+ * @returns {Promise<Object>} Updated order object
+ */
 export const updateOrder = createAsyncThunk(
   "orders/updateOrder",
   async ({ id, status, paymentStatus }, { rejectWithValue }) => {
@@ -39,6 +75,14 @@ export const updateOrder = createAsyncThunk(
 );
 
 /* ================= DELETE ORDER ================= */
+
+/**
+ * Async thunk to delete an order
+ * @async
+ * @function deleteOrder
+ * @param {string} id - Order ID
+ * @returns {Promise<string>} Deleted order ID
+ */
 export const deleteOrder = createAsyncThunk(
   "orders/deleteOrder",
   async (id, { rejectWithValue }) => {
@@ -53,15 +97,20 @@ export const deleteOrder = createAsyncThunk(
   }
 );
 
+/* ================= SLICE ================= */
+
+/** Orders slice initial state */
+const initialState = {
+  orders: [],
+  loading: false,
+  error: null,
+  updating: false,
+  deleting: false,
+};
+
 const ordersSlice = createSlice({
   name: "orders",
-  initialState: {
-    orders: [],
-    loading: false,
-    error: null,
-    updating: false,
-    deleting: false,
-  },
+  initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder

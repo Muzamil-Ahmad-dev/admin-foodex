@@ -1,33 +1,80 @@
+ 
  import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrders } from "../../features/orders/ordersSlice";
 import OrdersTable from "../../features/orders/OrdersTable";
 import OrdersSummary from "../../features/orders/OrdersSummary";
 
+/**
+ * OrdersPage Component
+ *
+ * Renders the Orders Dashboard including:
+ * - Gradient header
+ * - Search input for filtering orders by key
+ * - Orders summary card
+ * - Orders table
+ * - Pagination controls
+ *
+ * Integrates with Redux to fetch orders data.
+ *
+ * @component
+ * @example
+ * return <OrdersPage />
+ */
 export default function OrdersPage() {
   const dispatch = useDispatch();
+
+  /**
+   * Redux state selectors
+   * @typedef {Object} OrdersState
+   * @property {Array<Object>} orders - List of fetched orders
+   * @property {boolean} loading - Loading state for API request
+   * @property {string|null} error - Error message if request fails
+   * @property {number} total - Total number of orders
+   */
   const { orders, loading, error, total } = useSelector(
     (state) => state.orders
   );
 
+  /**
+   * Local state for pagination and search
+   * @type {[number, Function]}
+   */
   const [page, setPage] = useState(1);
+
+  /**
+   * Local state for search input value
+   * @type {[string, Function]}
+   */
   const [search, setSearch] = useState("");
+
+  /**
+   * Number of orders per page
+   * @type {number}
+   */
   const limit = 10;
 
+  /**
+   * Fetch orders whenever page, limit, or search changes
+   */
   useEffect(() => {
     dispatch(fetchOrders({ page, limit, search }));
   }, [dispatch, page, search]);
 
+  /**
+   * Compute total number of pages for pagination
+   * @type {number}
+   */
   const totalPages = Math.ceil(total / limit);
 
   return (
     <div className="p-4 sm:p-6">
-      {/* 🔥 GRADIENT TITLE */}
+      {/* GRADIENT TITLE */}
       <h1 className="text-2xl sm:text-3xl font-bold mb-6 bg-gradient-to-r from-amber-400 via-orange-500 to-amber-600 bg-clip-text text-transparent">
         Orders Dashboard
       </h1>
 
-      {/* 🔍 SEARCH (by order key only) */}
+      {/* SEARCH (by order key only) */}
       <div className="mb-6">
         <input
           type="text"
@@ -41,21 +88,21 @@ export default function OrdersPage() {
         />
       </div>
 
-      {/* 📊 SUMMARY CARD */}
+      {/* SUMMARY CARD */}
       <div className="bg-[#3B2A1E]/80 rounded-xl shadow-md p-4 mb-6">
         <OrdersSummary orders={orders} />
       </div>
 
-      {/* ⚠️ STATES */}
+      {/* STATES */}
       {loading && <p className="text-amber-400">Loading...</p>}
       {error && <p className="text-red-500">{error}</p>}
 
-      {/* 📋 TABLE CARD */}
+      {/* TABLE CARD */}
       <div className="bg-[#3B2A1E]/80 rounded-xl shadow-md p-4">
         <OrdersTable data={orders} />
       </div>
 
-      {/* 📄 PAGINATION */}
+      {/* PAGINATION */}
       <div className="flex justify-center items-center gap-4 mt-8">
         <button
           disabled={page === 1}

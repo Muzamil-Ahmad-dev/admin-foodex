@@ -1,14 +1,56 @@
- import React, { useEffect, useState } from "react";
+ /**
+ * @file SupportChat.jsx
+ * @description
+ * Admin interface component for managing **contact queries**.
+ * Provides the ability to:
+ * - View all contact queries
+ * - Respond to unanswered queries
+ * - Delete queries
+ * 
+ * Features:
+ * - Optimistic UI update for delete operations
+ * - Response handling with individual state tracking
+ * - Status display (resolved / pending)
+ * - Form validation for responses
+ * 
+ * Uses async API functions from `contactApi.js`:
+ * - fetchContacts
+ * - deleteContact
+ * - respondToContact
+ * 
+ * @module Components/SupportChat
+ * @dependencies
+ * - React (useState, useEffect)
+ * - contactApi.js
+ */
+
+import React, { useEffect, useState } from "react";
 import { fetchContacts, deleteContact, respondToContact } from "./contactApi";
 
+/**
+ * SupportChat Component
+ * @component
+ * @returns {JSX.Element} Admin support chat interface
+ */
 function SupportChat() {
+  /** @type {[Array<Object>, Function]} contacts - List of contact queries */
   const [contacts, setContacts] = useState([]);
+  
+  /** @type {[boolean, Function]} loading - Loading state for API calls */
   const [loading, setLoading] = useState(true);
+  
+  /** @type {[string, Function]} error - Error message if API fails */
   const [error, setError] = useState("");
-  const [responseText, setResponseText] = useState({}); // store responses per contact
-  const [respondingId, setRespondingId] = useState(null); // track which contact is being responded
+  
+  /** @type {[Object, Function]} responseText - Stores temporary responses keyed by contact ID */
+  const [responseText, setResponseText] = useState({});
+  
+  /** @type {[string|null, Function]} respondingId - Tracks which contact is being responded to */
+  const [respondingId, setRespondingId] = useState(null);
 
-  // Load all contacts
+  /**
+   * Fetch all contact queries from the server and update state.
+   */
   const loadContacts = async () => {
     try {
       setLoading(true);
@@ -22,25 +64,33 @@ function SupportChat() {
     }
   };
 
+  /** Load contacts on component mount */
   useEffect(() => {
     loadContacts();
   }, []);
 
-  // Optimistic delete
+  /**
+   * Delete a contact query optimistically.
+   * @param {string} id - Contact ID to delete
+   */
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this query?")) return;
     try {
-      // Remove from UI immediately
+      // Optimistic UI removal
       setContacts((prev) => prev.filter((c) => c._id !== id));
       await deleteContact(id);
     } catch (err) {
       alert(err.response?.data?.message || err.message);
-      // Re-fetch in case delete failed
+      // Re-fetch if deletion failed
       loadContacts();
     }
   };
 
-  // Respond to a contact
+  /**
+   * Respond to a contact query.
+   * Updates UI and backend asynchronously.
+   * @param {string} id - Contact ID
+   */
   const handleRespond = async (id) => {
     if (!responseText[id]) {
       alert("Response cannot be empty!");
@@ -56,7 +106,6 @@ function SupportChat() {
       setContacts((prev) =>
         prev.map((c) => (c._id === id ? updated : c))
       );
-      // Clear the response input
       setResponseText((prev) => ({ ...prev, [id]: "" }));
     } catch (err) {
       alert(err.response?.data?.message || err.message);

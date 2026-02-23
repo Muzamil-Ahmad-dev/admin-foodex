@@ -1,4 +1,31 @@
- "use client";
+ /**
+ * @file AdminLoginPage.jsx
+ * @description
+ * This component renders the **Admin Login Page** for the Foodify application.
+ * It allows existing administrators to log in by providing their email and password.
+ * 
+ * Features include:
+ * - Controlled input handling for email and password
+ * - Show/hide password toggle
+ * - Integration with Redux for admin authentication
+ * - Displays loading, success, and error feedback messages
+ * - Automatic navigation to dashboard upon successful login or if already authenticated
+ * - Responsive styling using Tailwind CSS
+ * - Logo and icons for UI enhancement using React Icons
+ * 
+ * @module Pages/AdminLoginPage
+ * @author 
+ * Muzamil Ahmad
+ *
+ * @dependencies
+ * - React & React Hooks (useState, useEffect)
+ * - React Redux (useDispatch, useSelector) for state management
+ * - React Router (useNavigate, Link) for page navigation
+ * - React Icons (GiChefToque, FaEye, FaEyeSlash) for UI elements
+ * - Redux Slice: authSlice for admin login
+ */
+
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,16 +34,37 @@ import { useNavigate, Link } from "react-router-dom";
 import { GiChefToque } from "react-icons/gi";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
+/**
+ * Admin Login Page Component
+ * 
+ * Handles login lifecycle:
+ * - Captures email and password input
+ * - Dispatches login action via Redux
+ * - Updates local success/error states
+ * - Navigates to dashboard upon successful login
+ */
 const AdminLoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  /** Redux state for admin login */
   const { loading, error, admin } = useSelector((state) => state.admin);
 
+  /** Local state for controlled inputs */
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  /** Toggle for showing/hiding password */
   const [showPassword, setShowPassword] = useState(false);
+
+  /** Local success message */
   const [success, setSuccess] = useState(null);
 
+  /**
+   * Handle form submission for admin login
+   * Dispatches login action and stores tokens in sessionStorage on success
+   * @param {React.FormEvent<HTMLFormElement>} e - Form submit event
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -33,6 +81,9 @@ const AdminLoginPage = () => {
     }
   };
 
+  /**
+   * Redirect to dashboard if admin is already authenticated
+   */
   useEffect(() => {
     if (admin) navigate("/dashboard");
   }, [admin, navigate]);

@@ -4,7 +4,7 @@ import ordersReducer from "../features/orders/ordersSlice";
 
 const store = configureStore({
   reducer: {
-    admin: adminReducer, // ✅ now defined
+    admin: adminReducer,  
      orders: ordersReducer,
   },
 });
