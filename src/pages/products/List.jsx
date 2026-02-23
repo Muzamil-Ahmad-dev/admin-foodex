@@ -5,6 +5,7 @@ import {
   updateMenuApi,
   getCategoriesApi,
 } from "../../features/menu/menu.api";
+import { FaLeaf, FaPepperHot, FaFire } from "react-icons/fa";
 
 const FoodList = () => {
   const [menus, setMenus] = useState([]);
@@ -16,14 +17,16 @@ const FoodList = () => {
   const [editData, setEditData] = useState({});
   const [preview, setPreview] = useState(null);
 
-  // Fetch menus and categories
+  const spiceOptions = [
+    { label: "Mild", value: "mild", icon: <FaLeaf className="text-green-400" /> },
+    { label: "Medium", value: "medium", icon: <FaPepperHot className="text-orange-400" /> },
+    { label: "Hot", value: "hot", icon: <FaFire className="text-red-500" /> },
+  ];
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [menusRes, catsRes] = await Promise.all([
-          getMenusApi(),
-          getCategoriesApi(),
-        ]);
+        const [menusRes, catsRes] = await Promise.all([getMenusApi(), getCategoriesApi()]);
         setMenus(menusRes.data.data);
         setCategories(catsRes.data.data);
       } catch (err) {
@@ -35,7 +38,6 @@ const FoodList = () => {
     fetchData();
   }, []);
 
-  // Delete menu item
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this menu item?")) return;
     try {
@@ -46,23 +48,17 @@ const FoodList = () => {
     }
   };
 
-  // Toggle availability
   const handleToggleAvailability = async (menu) => {
     try {
       await updateMenuApi(menu._id, { isAvailable: !menu.isAvailable });
       setMenus((prev) =>
-        prev.map((m) =>
-          m._id === menu._id
-            ? { ...m, isAvailable: !m.isAvailable }
-            : m
-        )
+        prev.map((m) => (m._id === menu._id ? { ...m, isAvailable: !m.isAvailable } : m))
       );
     } catch {
       alert("Failed to update availability");
     }
   };
 
-  // Start editing
   const handleEditClick = (menu) => {
     setEditMenuId(menu._id);
     setEditData({
@@ -79,7 +75,6 @@ const FoodList = () => {
     setPreview(menu.image);
   };
 
-  // Handle edit form changes
   const handleEditChange = (e) => {
     const { name, value, type, checked, files } = e.target;
     if (type === "file") {
@@ -93,14 +88,10 @@ const FoodList = () => {
     }
   };
 
-  // Submit edit form
   const handleEditSubmit = async (e) => {
     e.preventDefault();
 
-    if (
-      editData.discountPrice &&
-      Number(editData.discountPrice) >= Number(editData.price)
-    ) {
+    if (editData.discountPrice && Number(editData.discountPrice) >= Number(editData.price)) {
       alert("Discount price must be less than price");
       return;
     }
@@ -120,13 +111,11 @@ const FoodList = () => {
     }
   };
 
-  if (loading)
-    return <p className="text-center text-yellow-400">Loading...</p>;
-  if (error)
-    return <p className="text-center text-red-400">{error}</p>;
+  if (loading) return <p className="text-center text-yellow-400">Loading...</p>;
+  if (error) return <p className="text-center text-red-400">{error}</p>;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
       {menus.map((menu) => (
         <div
           key={menu._id}
@@ -138,12 +127,9 @@ const FoodList = () => {
             className="h-48 w-full object-cover"
           />
 
-          <div className="p-4 flex-1 text-yellow-100">
+          <div className="p-4 flex-1 text-yellow-100 flex flex-col">
             {editMenuId === menu._id ? (
-              <form
-                onSubmit={handleEditSubmit}
-                className="flex flex-col gap-2"
-              >
+              <form onSubmit={handleEditSubmit} className="flex flex-col gap-2">
                 <input
                   name="name"
                   value={editData.name}
@@ -175,36 +161,42 @@ const FoodList = () => {
                   value={editData.price}
                   onChange={handleEditChange}
                   className="rounded px-2 py-1"
+                  placeholder="Price (PKR)"
                 />
-
                 <input
                   type="number"
                   name="discountPrice"
                   value={editData.discountPrice}
                   onChange={handleEditChange}
                   className="rounded px-2 py-1"
+                  placeholder="Discount Price (PKR)"
                 />
-
                 <input
                   type="number"
                   name="stock"
                   value={editData.stock}
                   onChange={handleEditChange}
                   className="rounded px-2 py-1"
+                  placeholder="Stock"
                 />
 
-                <select
-                  name="spiceLevel"
-                  value={editData.spiceLevel}
-                  onChange={handleEditChange}
-                  className="rounded px-2 py-1"
-                >
-                  <option value="mild">🌿 Mild</option>
-                  <option value="medium">🌶 Medium</option>
-                  <option value="hot">🔥 Hot</option>
-                </select>
+                {/* Spice Level with icon preview */}
+                <div className="flex items-center gap-2 mt-1">
+                  {spiceOptions.map((opt) => (
+                    <button
+                      type="button"
+                      key={opt.value}
+                      onClick={() => setEditData({ ...editData, spiceLevel: opt.value })}
+                      className={`flex items-center gap-1 px-2 py-1 rounded ${
+                        editData.spiceLevel === opt.value ? "bg-gray-600" : "bg-gray-700"
+                      }`}
+                    >
+                      {opt.icon} {opt.label}
+                    </button>
+                  ))}
+                </div>
 
-                <label className="flex items-center gap-2 text-yellow-300 font-medium">
+                <label className="flex items-center gap-2 text-yellow-300 font-medium mt-2">
                   <input
                     name="isVeg"
                     type="checkbox"
@@ -212,14 +204,10 @@ const FoodList = () => {
                     onChange={handleEditChange}
                     className="accent-yellow-400"
                   />
-                  Vegetarian
+                  Vegetarian <FaLeaf className="text-green-400" />
                 </label>
 
-                <input
-                  type="file"
-                  name="imageFile"
-                  onChange={handleEditChange}
-                />
+                <input type="file" name="imageFile" onChange={handleEditChange} />
 
                 <div className="flex gap-2 mt-2">
                   <button className="flex-1 bg-yellow-400 text-brown-900 font-bold py-1 rounded">
@@ -236,9 +224,32 @@ const FoodList = () => {
               </form>
             ) : (
               <>
-                <h3 className="text-xl font-bold">{menu.name}</h3>
+                <h3 className="text-xl font-bold flex items-center gap-2">
+                  {menu.name}
+                  {menu.isVeg && <FaLeaf className="text-green-400" />}
+                </h3>
+
                 <p className="text-sm opacity-90">{menu.description}</p>
-                <p className="font-bold mt-1">₹{menu.price}</p>
+
+                <div className="flex items-center gap-3 mt-1">
+                  <p className="font-bold">PKR {menu.price}</p>
+
+                  {menu.spiceLevel === "mild" && (
+                    <span className="flex items-center gap-1 text-green-400 text-sm">
+                      <FaLeaf /> Mild
+                    </span>
+                  )}
+                  {menu.spiceLevel === "medium" && (
+                    <span className="flex items-center gap-1 text-orange-400 text-sm">
+                      <FaPepperHot /> Medium
+                    </span>
+                  )}
+                  {menu.spiceLevel === "hot" && (
+                    <span className="flex items-center gap-1 text-red-500 text-sm">
+                      <FaFire /> Hot
+                    </span>
+                  )}
+                </div>
 
                 <div className="flex gap-2 mt-4">
                   <button
