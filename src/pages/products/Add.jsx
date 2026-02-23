@@ -4,7 +4,7 @@ import React, { useState, useEffect, Fragment } from "react";
 import { createMenuApi, getCategoriesApi } from "../../features/menu/menu.api";
 import { useNavigate } from "react-router-dom";
 import { Listbox, Transition } from "@headlessui/react";
-import { FaLeaf, FaPepperHot, FaFire } from "react-icons/fa";
+import { FaLeaf, FaPepperHot, FaFire, FaUpload } from "react-icons/fa";
 
 const AddFood = () => {
   const navigate = useNavigate();
@@ -149,15 +149,19 @@ const AddFood = () => {
               />
             </div>
 
-            {/* Image Upload */}
+            {/* Image Upload with Icon */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <input
-                name="imageFile"
-                type="file"
-                accept="image/*"
-                onChange={handleChange}
-                className="text-white"
-              />
+              <label className="flex items-center gap-2 cursor-pointer bg-gray-700 px-4 py-3 rounded-lg hover:bg-gray-600">
+                <FaUpload className="text-amber-400" />
+                <span>{formData.imageFile ? formData.imageFile.name : "Choose Image"}</span>
+                <input
+                  name="imageFile"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleChange}
+                  className="hidden"
+                />
+              </label>
               {preview && (
                 <img
                   src={preview}
