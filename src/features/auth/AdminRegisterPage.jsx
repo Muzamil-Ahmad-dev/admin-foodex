@@ -1,31 +1,4 @@
- /**
- * @file AdminRegisterPage.jsx
- * @description
- * This component renders the **Admin Registration Page** for the Foodify application.
- * It allows new administrators to register by providing their name, email, and password.
- * 
- * Features include:
- * - Form input handling for name, email, and password
- * - Show/hide password toggle
- * - Integration with Redux for admin registration
- * - Feedback messages for success or error
- * - Automatic navigation to dashboard upon successful registration or if already logged in
- * - Responsive styling using Tailwind CSS
- * - Icons for enhanced UI using React Icons
- * 
- * @module Pages/AdminRegisterPage
- * @author 
- * Muzamil Ahmad
- *
- * @dependencies
- * - React & React Hooks (useState, useEffect)
- * - React Redux (useDispatch, useSelector) for state management
- * - React Router (useNavigate, Link) for navigation
- * - React Icons (GiChefToque, FaEye, FaEyeSlash) for UI elements
- * - Redux Slice: authSlice for admin registration
- */
-
-"use client";
+ "use client";
 
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -34,23 +7,11 @@ import { useNavigate, Link } from "react-router-dom";
 import { GiChefToque } from "react-icons/gi";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
-/**
- * Admin Registration Page Component
- * 
- * Handles the complete lifecycle of admin registration:
- * - Capturing form inputs
- * - Dispatching registration action
- * - Handling loading, success, and error states
- * - Navigating to dashboard upon success
- */
 const AdminRegisterPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  /** Redux state for admin registration */
   const { loading, error, admin } = useSelector((state) => state.admin);
 
-  /** Form data state for controlled inputs */
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -58,25 +19,12 @@ const AdminRegisterPage = () => {
     role: "admin",
   });
 
-  /** Show/hide password state */
   const [showPassword, setShowPassword] = useState(false);
-
-  /** Local success message state */
   const [success, setSuccess] = useState(null);
 
-  /**
-   * Handle input changes
-   * @param {React.ChangeEvent<HTMLInputElement>} e - Input change event
-   */
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  /**
-   * Handle form submission
-   * Dispatches admin registration action to Redux
-   * Stores tokens in sessionStorage and navigates to dashboard on success
-   * @param {React.FormEvent<HTMLFormElement>} e - Form submit event
-   */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -93,9 +41,6 @@ const AdminRegisterPage = () => {
     }
   };
 
-  /**
-   * Redirect to dashboard if already logged in
-   */
   useEffect(() => {
     if (admin) navigate("/dashboard");
   }, [admin, navigate]);
@@ -108,7 +53,7 @@ const AdminRegisterPage = () => {
         <div className="flex justify-center gap-2 mb-4">
           <GiChefToque className="text-3xl text-amber-500" />
           <h1 className="text-2xl font-bold text-amber-400">
-            Foodify
+            Foodiy
           </h1>
         </div>
 

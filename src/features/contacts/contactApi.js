@@ -1,27 +1,8 @@
- /**
- * @file contact.api.js
- * @description
- * This module provides **admin APIs for managing contact queries** in the Foodify application.
- * All requests use the preconfigured `adminAxios` instance for authentication and server communication.
- * 
- * Features:
- * - Fetch all contact queries
- * - Fetch a single contact by ID
- * - Respond to a contact query
- * - Delete a contact query
- * 
- * @module Api/adminContacts
- * @dependencies
- * - adminAxios: Axios instance preconfigured for admin routes
- */
+ import adminAxios from "../../api/adminApi"; // reuse admin axios
 
-import adminAxios from "../../api/adminApi"; // reuse admin axios
-
-/**
- * Fetches all contact queries from the server.
- * @returns {Promise<Array<Object>>} Array of contact objects
- * @throws Will throw an error if the request fails
- */
+// -----------------------------
+// Get all contact queries (Admin)
+// -----------------------------
 export const fetchContacts = async () => {
   try {
     const res = await adminAxios.get("/contact");
@@ -32,12 +13,9 @@ export const fetchContacts = async () => {
   }
 };
 
-/**
- * Fetches a single contact query by ID.
- * @param {string} id - Contact ID
- * @returns {Promise<Object>} Contact object
- * @throws Will throw an error if the request fails
- */
+// -----------------------------
+// Get single contact
+// -----------------------------
 export const fetchContactById = async (id) => {
   try {
     const res = await adminAxios.get(`/contact/${id}`);
@@ -48,13 +26,9 @@ export const fetchContactById = async (id) => {
   }
 };
 
-/**
- * Responds to a contact query by ID.
- * @param {string} id - Contact ID
- * @param {Object} responseData - Response data (e.g., message content)
- * @returns {Promise<Object>} Updated contact object
- * @throws Will throw an error if the request fails
- */
+// -----------------------------
+// Respond to contact
+// -----------------------------
 export const respondToContact = async (id, responseData) => {
   try {
     const res = await adminAxios.put(`/contact/${id}/respond`, responseData);
@@ -65,12 +39,9 @@ export const respondToContact = async (id, responseData) => {
   }
 };
 
-/**
- * Deletes a contact query by ID.
- * @param {string} id - Contact ID
- * @returns {Promise<Object>} Server response object
- * @throws Will throw an error if the request fails
- */
+// -----------------------------
+// Delete contact
+// -----------------------------
 export const deleteContact = async (id) => {
   try {
     const res = await adminAxios.delete(`/contact/${id}`);

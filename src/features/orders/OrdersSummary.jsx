@@ -1,44 +1,17 @@
- /**
- * @file OrdersSummary.jsx
- * @description
- * A summary dashboard component that displays key order metrics.
- * 
- * Metrics displayed:
- * - Total number of orders
- * - Total revenue
- * - Revenue from card payments
- * - Number of Cash-on-Delivery (COD) orders
- * 
- * @module Components/OrdersSummary
- * @param {Object} props
- * @param {Array<Object>} [props.orders=[]] - List of order objects
- * Each order object may contain:
- *   @property {number} totalAmount - Total amount of the order
- *   @property {string} paymentMethod - Payment method (e.g., "CARD", "COD")
- *   @property {string} paymentStatus - Payment status (e.g., "Paid")
- * @returns {JSX.Element} Summary cards with order metrics
- * 
- * @example
- * <OrdersSummary orders={ordersArray} />
- */
-import React from "react";
+ import React from "react";
 
 export default function OrdersSummary({ orders = [] }) {
-  // Total number of orders
   const totalOrders = orders.length;
 
-  // Total revenue
   const totalRevenue = orders.reduce(
     (sum, o) => sum + (o.totalAmount || 0),
     0
   );
 
-  // Revenue from card payments (only paid)
   const cardRevenue = orders
     .filter((o) => o.paymentMethod === "CARD" && o.paymentStatus === "Paid")
     .reduce((sum, o) => sum + (o.totalAmount || 0), 0);
 
-  // Count of COD orders
   const codOrders = orders.filter((o) => o.paymentMethod === "COD").length;
 
   return (

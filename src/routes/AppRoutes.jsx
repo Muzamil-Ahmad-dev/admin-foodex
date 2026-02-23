@@ -27,14 +27,6 @@ import AdminRegisterPage from "../features/auth/AdminRegisterPage";
 /* ==========================
    Admin Protected Route
 ========================== */
-
-/**
- * Protects routes to ensure only admins can access.
- *
- * @param {Object} props
- * @param {React.ReactNode} props.children - Child components to render if admin is authenticated
- * @returns {React.ReactNode} - Either the children or a redirect
- */
 const AdminRoute = ({ children }) => {
   const { admin } = useSelector((state) => state.admin) || {};
 
@@ -47,14 +39,6 @@ const AdminRoute = ({ children }) => {
 /* ==========================
    App Routes
 ========================== */
-
-/**
- * Main application routes including public auth routes and admin-protected routes.
- *
- * @component
- * @example
- * return <AppRoutes />
- */
 const AppRoutes = () => {
   return (
     <Routes>

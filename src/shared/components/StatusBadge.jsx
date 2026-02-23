@@ -1,16 +1,6 @@
  import React from "react";
 import { motion } from "framer-motion";
 
-/**
- * Badge component to display a status label with color coding and animation.
- *
- * @param {Object} props
- * @param {string} props.status - The status to display. Can be "active", "inactive", or "pending".
- *                                 Any other value will display as a gray badge.
- * @component
- * @example
- * return <StatusBadge status="active" />
- */
 const StatusBadge = ({ status }) => {
   const colors = {
     active: "bg-green-500/20 text-green-400",

@@ -4,25 +4,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { adminLogout } from "../../features/auth/authSlice"; // updated
 
-/**
- * Navbar component displayed at the top of the dashboard.
- * Supports hamburger menu toggle, notifications, admin info, and logout.
- *
- * @param {Object} props
- * @param {boolean} props.menuOpen - Current state of the sidebar/menu (open/closed)
- * @param {Function} props.setMenuOpen - Function to toggle the menu state
- * @component
- * @example
- * return <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
- */
 const Navbar = ({ menuOpen, setMenuOpen }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { admin } = useSelector((state) => state.admin);
 
-  /**
-   * Logs out the current admin and navigates to the login page
-   */
   const handleLogout = async () => {
     await dispatch(adminLogout());
     navigate("/admin"); // redirect to login

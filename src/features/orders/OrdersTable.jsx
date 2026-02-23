@@ -1,37 +1,4 @@
- /**
- * @file OrdersTable.jsx
- * @description
- * Renders a table of orders for admin view, allowing:
- * - Updating order status
- * - Updating payment status
- * - Deleting orders
- * - Exporting all orders to an Excel file
- * 
- * @module Components/OrdersTable
- * 
- * @param {Object} props
- * @param {Array<Object>} [props.data=[]] - Array of order objects
- * Each order object may contain:
- *   @property {string} _id - Unique order ID
- *   @property {Array<Object>} items - Array of ordered items
- *      @property {Object} menuItem - Menu item object
- *         @property {string} name - Name of menu item
- *      @property {number} quantity - Quantity ordered
- *   @property {number} totalAmount - Total order amount
- *   @property {string} paymentMethod - "CARD" or "COD"
- *   @property {string} paymentStatus - "Pending", "Paid", or "Failed"
- *   @property {string} status - Order status ("Pending", "Preparing", etc.)
- *   @property {string} stripePaymentIntentId - Stripe payment ID (optional)
- *   @property {string} deliveryAddress - Customer address
- *   @property {string} contactNumber - Customer contact number
- *   @property {string|Date} createdAt - Order creation date
- * 
- * @returns {JSX.Element} Table with admin controls
- * 
- * @example
- * <OrdersTable data={ordersArray} />
- */
-import React from "react";
+ import React from "react";
 import { useDispatch } from "react-redux";
 import { updateOrder, deleteOrder } from "../../features/orders/ordersSlice";
 import * as XLSX from "xlsx";
@@ -78,6 +45,7 @@ export default function OrdersTable({ data = [] }) {
 
   return (
     <div>
+      {/* Download Button */}
       <button
         onClick={handleDownloadExcel}
         className="mb-4 px-4 py-2 bg-amber-500 text-black rounded-lg hover:bg-amber-400 transition"
@@ -123,7 +91,9 @@ export default function OrdersTable({ data = [] }) {
 
                 <td className="border px-3 py-2">
                   {row.items
-                    .map((i) => `${i.menuItem?.name || "N/A"} x ${i.quantity}`)
+                    .map(
+                      (i) => `${i.menuItem?.name || "N/A"} x ${i.quantity}`
+                    )
                     .join(", ")}
                 </td>
 
@@ -131,6 +101,7 @@ export default function OrdersTable({ data = [] }) {
                   ₨{row.totalAmount.toLocaleString("en-PK")}
                 </td>
 
+                {/* Payment Method */}
                 <td className="border px-3 py-2">
                   <span
                     className={`px-2 py-1 rounded text-white text-xs ${
@@ -143,6 +114,7 @@ export default function OrdersTable({ data = [] }) {
                   </span>
                 </td>
 
+                {/* Payment Status */}
                 <td className="border px-3 py-2">
                   <select
                     value={row.paymentStatus || "Pending"}
@@ -157,6 +129,7 @@ export default function OrdersTable({ data = [] }) {
                   </select>
                 </td>
 
+                {/* Order Status */}
                 <td className="border px-3 py-2">
                   <select
                     value={row.status || "Pending"}

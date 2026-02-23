@@ -6,38 +6,9 @@ import { useNavigate } from "react-router-dom";
 import { Listbox, Transition } from "@headlessui/react";
 import { FaLeaf, FaPepperHot, FaFire, FaUpload } from "react-icons/fa";
 
-/**
- * AddFood Component
- *
- * Renders a form to create a new food item in the menu.
- * Features include:
- * - Controlled form inputs for name, description, category, price, discount, stock
- * - File upload with image preview
- * - Spice level selector using Headless UI Listbox
- * - Vegetarian checkbox
- * - Real-time form validation (discount vs price, category selection)
- * - API integration to fetch categories and create a menu item
- *
- * @component
- * @example
- * return <AddFood />;
- */
 const AddFood = () => {
   const navigate = useNavigate();
 
-  /**
-   * Form state for creating a new food item
-   * @typedef {Object} FormData
-   * @property {string} name - Name of the food
-   * @property {string} description - Description of the food
-   * @property {string} category - Selected category ID
-   * @property {string|number} price - Original price
-   * @property {string|number} discountPrice - Discounted price
-   * @property {File|null} imageFile - Uploaded image file
-   * @property {boolean} isVeg - Whether the food is vegetarian
-   * @property {string} spiceLevel - Spice level ('mild'|'medium'|'hot')
-   * @property {number} stock - Available stock
-   */
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -50,21 +21,11 @@ const AddFood = () => {
     stock: 100,
   });
 
-  /** @type {[string|null, Function]} Preview URL for image file */
   const [preview, setPreview] = useState(null);
-
-  /** @type {[Array<Object>, Function]} List of categories from API */
   const [categories, setCategories] = useState([]);
-
-  /** @type {[boolean, Function]} Loading state for form submission */
   const [loading, setLoading] = useState(false);
-
-  /** @type {[string|null, Function]} Error message state */
   const [error, setError] = useState(null);
 
-  /**
-   * Fetch categories on component mount
-   */
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -77,10 +38,6 @@ const AddFood = () => {
     fetchCategories();
   }, []);
 
-  /**
-   * Handle input changes for all fields
-   * @param {React.ChangeEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>} e
-   */
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
     if (type === "file") {
@@ -94,10 +51,6 @@ const AddFood = () => {
     }
   };
 
-  /**
-   * Submit handler to create new menu item
-   * @param {React.FormEvent<HTMLFormElement>} e
-   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -125,7 +78,6 @@ const AddFood = () => {
     }
   };
 
-  /** Spice level options for Listbox */
   const spiceOptions = [
     { label: "Mild", value: "mild", icon: <FaLeaf className="text-green-400" /> },
     { label: "Medium", value: "medium", icon: <FaPepperHot className="text-orange-400" /> },

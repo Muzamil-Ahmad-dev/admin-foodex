@@ -5,14 +5,6 @@ import { Outlet } from "react-router-dom"; // Import Outlet
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 
-/**
- * Layout component for admin dashboard.
- * Includes Sidebar, Navbar, and a main content area where nested routes render via <Outlet />.
- *
- * @component
- * @example
- * return <AdminLayout />
- */
 export default function AdminLayout() {
   const [desktopOpen, setDesktopOpen] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
